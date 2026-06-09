@@ -1,0 +1,46 @@
+#separator:tab
+#html:true
+#notetype:Basic
+#columns:Front	Back	Tags
+다음 함수를 미분하시오.<br>\( (2x+1)\,e^{x^2} \)	\( 2\,e^{x^2} + (2x+1)\,e^{x^2}\cdot 2x \)<br>곱의 미분 + 연쇄법칙: \( (2x+1)'e^{x^2} + (2x+1)(e^{x^2})' \), \( (e^{x^2})'=2x\,e^{x^2} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( x\cos x \)	\( \cos x - x\sin x \)<br>곱의 미분: \( (x)'\cos x + x(\cos x)' = \cos x - x\sin x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( (x^2+1)\sin x \)	\( 2x\sin x + (x^2+1)\cos x \)<br>곱의 미분: \( (x^2+1)'\sin x + (x^2+1)(\sin x)' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( \cos x \)	\( -\sin x \)	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( x\ln x \)	\( \ln x + 1 \) \( (x>0) \)<br>곱의 미분: \( (x)'\ln x + x\cdot\dfrac1x = \ln x + 1 \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \sin(\ln x) \)	\( \cos(\ln x)\cdot\dfrac1x \) \( (x>0) \)<br>연쇄법칙: 바깥 \( \sin \)의 도함수 \( \cos(\ln x) \)에 안쪽 \( (\ln x)'=\dfrac1x \)를 곱한다.	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( x^2(x^2+1) \)	\( 4x^3 + 2x \)<br>전개하면 \( x^4+x^2 \), 미분하면 \( 4x^3+2x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 미분
+다음 함수를 미분하시오.<br>\( x^2\cos x \)	\( 2x\cos x - x^2\sin x \)<br>곱의 미분: \( (x^2)'\cos x + x^2(\cos x)' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \ln|x| \)	\( \dfrac1x \) \( (x\neq 0) \)	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 미분
+다음 함수를 미분하시오.<br>\( x^3\sin x \)	\( 3x^2\sin x + x^3\cos x \)<br>곱의 미분: \( (x^3)'\sin x + x^3(\sin x)' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( (x^2+1)(x^3-2) \)	\( 2x(x^3-2) + (x^2+1)\cdot 3x^2 \)<br>곱의 미분 그대로 두면 위 꼴. 전개하면 \( 5x^4+3x^2-4x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( x^2\ln x \)	\( 2x\ln x + x \) \( (x>0) \)<br>곱의 미분: \( (x^2)'\ln x + x^2\cdot\dfrac1x = 2x\ln x + x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \sqrt{x}\,e^x \)	\( \dfrac{1}{2\sqrt{x}}\,e^x + \sqrt{x}\,e^x \) \( (x>0) \)<br>곱의 미분: \( (\sqrt{x})'e^x + \sqrt{x}(e^x)' \), \( (\sqrt{x})'=\dfrac{1}{2\sqrt{x}} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( x^2\sin x \)	\( 2x\sin x + x^2\cos x \)<br>곱의 미분: \( (x^2)'\sin x + x^2(\sin x)' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( x^3\cos x \)	\( 3x^2\cos x - x^3\sin x \)<br>곱의 미분: \( (x^3)'\cos x + x^3(\cos x)' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \cos x\,\ln(x+3) \)	\( -\sin x\,\ln(x+3) + \dfrac{\cos x}{x+3} \) \( (x>-3) \)<br>곱의 미분 + 연쇄법칙: \( (\cos x)'\ln(x+3) + \cos x\cdot\dfrac{1}{x+3} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( \ln(x^2+1) \)	\( \dfrac{2x}{x^2+1} \)<br>연쇄법칙: \( \dfrac{1}{x^2+1}\cdot(x^2+1)' = \dfrac{2x}{x^2+1} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( e^{x^2} \)	\( 2x\,e^{x^2} \)<br>연쇄법칙: \( e^{x^2}\cdot(x^2)' = 2x\,e^{x^2} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \tan 3x \)	\( 3\sec^2 3x \) \( (\cos 3x\neq 0) \)<br>연쇄법칙: \( \sec^2 3x\cdot(3x)' = 3\sec^2 3x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( e^{3x+2} \)	\( 3\,e^{3x+2} \)<br>연쇄법칙: 바깥 지수함수, 안쪽 \( (3x+2)'=3 \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( (2x+1)e^x \)	\( 2\,e^x + (2x+1)e^x \)<br>곱의 미분: \( (2x+1)'e^x + (2x+1)(e^x)' = (2x+3)e^x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \ln(1-x) \)	\( \dfrac{-1}{1-x} \) \( (1-x>0,\ \text{즉}\ x<1) \)<br>연쇄법칙: \( \dfrac{1}{1-x}\cdot(1-x)' = \dfrac{-1}{1-x} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \ln x\cdot e^{3x} \)	\( \dfrac1x e^{3x} + \ln x\cdot e^{3x}\cdot 3 \) \( (x>0) \)<br>곱의 미분 + 연쇄법칙: \( (\ln x)'e^{3x} + \ln x\,(e^{3x})' \), \( (e^{3x})'=3e^{3x} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( x^2 e^{\sin x} \)	\( 2x\,e^{\sin x} + x^2\cos x\,e^{\sin x} \)<br>곱의 미분 + 연쇄법칙: \( (x^2)'e^{\sin x} + x^2(e^{\sin x})' \), \( (e^{\sin x})'=\cos x\,e^{\sin x} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( e^x \)	\( e^x \)	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 미분
+다음 함수를 미분하시오 (단, \( +1 \)은 상수).<br>\( x^3(e^x+1) \)	\( 3x^2(e^x+1) + x^3 e^x \)<br>곱의 미분: \( (x^3)'(e^x+1) + x^3(e^x+1)' \), \( (e^x+1)'=e^x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오 (정의역과 부호에 주의).<br>\( \ln(\cos x) \)	\( \dfrac{-\sin x}{\cos x}\ (=-\tan x) \) \( (\cos x>0) \)<br>연쇄법칙: \( \dfrac{1}{\cos x}\cdot(\cos x)' = \dfrac{-\sin x}{\cos x} \). 부호 마이너스.	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( \sin(4x+1) \)	\( 4\cos(4x+1) \)<br>연쇄법칙: \( \cos(4x+1)\cdot(4x+1)' = 4\cos(4x+1) \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \ln(5x-7) \)	\( \dfrac{5}{5x-7} \) \( (5x-7>0) \)<br>연쇄법칙: \( \dfrac{1}{5x-7}\cdot(5x-7)' = \dfrac{5}{5x-7} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오 (정의역도 밝히시오).<br>\( \sqrt{5x+1} \)	\( \dfrac{5}{2\sqrt{5x+1}} \) \( (5x+1>0) \)<br>연쇄법칙: \( \dfrac{1}{2\sqrt{5x+1}}\cdot(5x+1)' = \dfrac{5}{2\sqrt{5x+1}} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오 (정의역과 부호에 주의).<br>\( \ln(\cos 2x) \)	\( \dfrac{-2\sin 2x}{\cos 2x}\ (=-2\tan 2x) \) \( (\cos 2x>0) \)<br>연쇄법칙: \( \dfrac{1}{\cos 2x}\cdot(\cos 2x)' \), \( (\cos 2x)'=-2\sin 2x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( (1+\sin x)^9 \)	\( 9(1+\sin x)^8\cos x \)<br>연쇄법칙: \( 9(1+\sin x)^8\cdot(1+\sin x)' \), \( (1+\sin x)'=\cos x \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( (1+\sin x)^7 \)	\( 7(1+\sin x)^6\cos x \)<br>연쇄법칙: \( 7(1+\sin x)^6\cdot(1+\sin x)' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 세 겹 합성함수를 미분하시오 (정의역도 밝히시오).<br>\( \sin\bigl(\ln(\cos x)\bigr) \)	\( \cos\bigl(\ln(\cos x)\bigr)\cdot\dfrac{1}{\cos x}\cdot(-\sin x) \) \( (\cos x>0) \)<br>안쪽부터: \( \cos(\ln(\cos x)) \times (\ln(\cos x))' \), 그리고 \( (\ln(\cos x))'=\dfrac{-\sin x}{\cos x} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 연쇄법칙
+다음 함수를 미분하시오.<br>\( x\,e^{2x} \)	\( e^{2x} + 2x\,e^{2x}\ (=(2x+1)e^{2x}) \)<br>곱의 미분 + 연쇄법칙: \( (x)'e^{2x} + x(e^{2x})' \), \( (e^{2x})'=2e^{2x} \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+다음 함수를 미분하시오.<br>\( x\,e^{\sin x} \)	\( e^{\sin x} + x\cos x\,e^{\sin x} \)<br>곱의 미분 + 연쇄법칙: \( (x)'e^{\sin x} + x(e^{\sin x})' \).	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 곱의미분
+"먼저 식을 정리한 뒤" 미분하시오 (적절한 구간에서).<br>\( \sqrt{\sin^2 x} + \ln(e^{2x}) \)	\( \cos x + 2 \)<br>\( \sqrt{\sin^2 x}=\sin x \), \( \ln(e^{2x})=2x \) 이므로 식은 \( \sin x + 2x \). 미분하면 \( \cos x + 2 \). (공식에 곧장 넣지 말고 먼저 정리하는 것이 핵심.)	MfPaNSS 04-season-23 09-Derivative ko-kr 계산 합성함수
+\( \ln(\cdot) \) 안에 들어간 식과, 식이 분모로 갈 때의 정의역 조건은 각각 무엇인가?	\( \ln(\text{안쪽}) \)의 안쪽 식은 <b>0보다 커야</b> 하고, 식이 <b>분모</b>로 가면 <b>0이 아니기만</b> 하면 된다. 두 조건을 헷갈리지 않는 것이 핵심.	MfPaNSS 04-season-23 09-Derivative ko-kr 암기 정의역
+\( \tan 3x \)의 정의역을 설명하시오 (왜 그렇게 되는지 포함).	\( \tan 3x = \dfrac{\sin 3x}{\cos 3x} \)이므로 \( \cos 3x\neq 0 \)이어야 한다. 즉 \( 3x \neq \pm\dfrac{\pi}{2} + 2\pi n \) (\( n \) 정수)인 <b>점들</b>만 제외하는 것이지, 구간을 통째로 빼는 것이 아니다.	MfPaNSS 04-season-23 09-Derivative ko-kr 암기 정의역
+\( \displaystyle\int \sec^2 x\,dx \)와 \( \displaystyle\int \csc^2 x\,dx \)를 (외워서) 답하시오.	\( \displaystyle\int \sec^2 x\,dx = \tan x + C \), \( \displaystyle\int \csc^2 x\,dx = -\cot x + C \).<br>\( \tan x \)와 \( -\cot x \)가 서로 짝을 이루므로 짝으로 외워 두면 빠르다.	MfPaNSS 04-season-23 09-Derivative ko-kr 암기 적분
+합성함수의 적분에서 "안쪽 미분 보정"은 언제 어떻게 하는가? (\( \displaystyle\int(x+1)^2dx \) vs \( \displaystyle\int\frac{1}{5x-2}dx \))	적분은 "연쇄법칙을 거꾸로" 하는 것. 안쪽을 미분한 값이 <b>상수</b>일 때만 그 값으로 나눠 보정한다. \( (x+1) \)은 미분해도 \( 1 \)이라 보정이 필요 없어 \( \dfrac{(x+1)^3}{3}+C \). \( 5x-2 \)는 미분하면 \( 5 \)가 나오므로 \( \dfrac15 \)을 곱해 \( \dfrac15\ln|5x-2|+C \). 괄호 안과 밖을 <b>둘 다</b> 적분하면 안 된다.	MfPaNSS 04-season-23 09-Derivative ko-kr 암기 적분
+"어려운 문제가 아니라 어려운 답"이란 무엇을 뜻하는가? (\( \sqrt{\sin^2 x}+\ln(e^{2x}) \) 예)	식을 곧장 공식에 넣지 말고 <b>먼저 정리할 수 있는지</b> 보라는 발상의 전환. 겉보기엔 복잡해도 \( \sqrt{\sin^2 x}=\sin x \), \( \ln(e^{2x})=2x \)로 단순화되어 \( \sin x + 2x \)가 되고, 미분하면 \( \cos x + 2 \)로 답이 간단해진다.	MfPaNSS 04-season-23 09-Derivative ko-kr 암기 방법

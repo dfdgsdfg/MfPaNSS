@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>0. 미분과 적분이 들어오는 맥락 — 선형화와 그 역-09강 4기 21강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">[직장인과 문과생을 위한 수학교실 4기] 21. 미적분학 훈련 설계-09강 4기 21강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">0. 미분과 적분이 들어오는 맥락 — 선형화와 그 역</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    곡선을 한 점 <b class="text-blue-600">a</b> 근방에서 가장 잘 흉내 내는 직선이 <b>접선</b>이고, 그 접선이 미분이 만들어 내는 <b>선형화</b>입니다.
+    접선의 기울기 <span id="fpdef"></span> 는 <b class="text-rose-600">할선</b>의 기울기 <span id="secdef"></span> 를 <span id="hlim"></span> 으로 보낸 극한입니다.
+    슬라이더로 <span class="font-mono">h</span> 를 줄여 보고, <b class="text-blue-600">a</b> 점을 끌어 보세요 — 할선(붉은선)이 접선(파란 점선)으로 수렴합니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">함수 f
+          <select id="fsel" class="w-full mt-1 text-sm rounded border-slate-300 bg-slate-50 p-1">
+            <option value="sq">f(x) = x²</option>
+            <option value="cube">f(x) = x³ − x</option>
+            <option value="sin">f(x) = sin x</option>
+            <option value="exp">f(x) = eˣ</option>
+          </select></label>
+        <label class="block text-sm">h (할선 간격) <span id="hv" class="float-right font-mono text-slate-500"></span>
+          <input id="h" type="range" min="0.01" max="2" step="0.01" value="1.2" class="w-full accent-rose-600" /></label>
+        <label class="block text-sm">a (접점 위치) <span id="av" class="float-right font-mono text-slate-500"></span>
+          <input id="a" type="range" min="-2.5" max="2.5" step="0.05" value="1" class="w-full accent-blue-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="shrink" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">h → 0 보내기</button>
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">리셋</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">할선 기울기</span><span id="sec" class="font-mono text-rose-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f'(a) (접선)</span><span id="tan" class="font-mono text-blue-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">오차 |할선−접선|</span><span id="err" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        할선 기울기 = (f(a+h) − f(a)) / h.&nbsp; h → 0 이면 이 값이 f'(a) 로 수렴합니다.
+        오차는 h 에 거의 비례해 줄어듭니다(국소 선형 근사).
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+
+const FNS = {
+  sq:   { f: t => t*t,             d: t => 2*t,             label: 'x^2' },
+  cube: { f: t => t*t*t - t,       d: t => 3*t*t - 1,       label: 'x^3 - x' },
+  sin:  { f: t => Math.sin(t),     d: t => Math.cos(t),     label: 'sin x' },
+  exp:  { f: t => Math.exp(t),     d: t => Math.exp(t),     label: 'e^x' },
+};
+let cur = 'sq';
+let H = 1.2, A = 1.0;
+let S = 70, drag = false;
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(340, Math.round(css * 0.78));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css, h) / 6.4;            // fit roughly ±3 units
+  draw();
+}
+function W2S(p) { return { x: cv.clientWidth / 2 + p.x * S, y: viewH() / 2 - p.y * S }; }
+function viewH() { return cv.height / (window.devicePixelRatio || 1); }
+function S2Wx(sx) { return (sx - cv.clientWidth / 2) / S; }
+
+function line(p1, p2) {
+  const a = W2S(p1), b = W2S(p2);
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+}
+function dot(p, color, r=5) {
+  const s = W2S(p);
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, 2*Math.PI); ctx.fill();
+}
+
+function draw() {
+  const w = cv.clientWidth, h = viewH();
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -4; i <= 4; i++) { line({x:i,y:-4},{x:i,y:4}); line({x:-4,y:i},{x:4,y:i}); }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  line({x:-4,y:0},{x:4,y:0}); line({x:0,y:-4},{x:0,y:4});
+
+  const F = FNS[cur];
+  // curve
+  ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2.2; ctx.beginPath();
+  let started = false;
+  for (let sx = 0; sx <= w; sx += 2) {
+    const xw = S2Wx(sx), yw = F.f(xw);
+    if (Math.abs(yw) > 6) { started = false; continue; }    // skip blow-ups (e.g. e^x)
+    const sy = W2S({x: xw, y: yw}).y;
+    if (!started) { ctx.moveTo(sx, sy); started = true; } else ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+
+  const fa = F.f(A), fah = F.f(A + H);
+  const sec = (fah - fa) / H;       // secant slope
+  const tan = F.d(A);               // f'(a)
+
+  // tangent line (blue dashed): y = fa + tan*(x-a)
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.2; ctx.setLineDash([6,4]);
+  line({x:-4, y: fa + tan*(-4 - A)}, {x:4, y: fa + tan*(4 - A)});
+  ctx.setLineDash([]);
+  // secant line (red): through (a,fa) and (a+h, fah)
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2.0;
+  line({x:-4, y: fa + sec*(-4 - A)}, {x:4, y: fa + sec*(4 - A)});
+
+  // points
+  dot({x: A, y: fa}, '#2563eb', 6);                    // anchor a (draggable)
+  dot({x: A + H, y: fah}, '#e11d48', 5);               // a+h
+  // labels
+  ctx.fillStyle = '#2563eb'; ctx.font = 'bold 13px ui-sans-serif';
+  const pa = W2S({x: A, y: fa}); ctx.fillText('a', pa.x + 8, pa.y + 16);
+  ctx.fillStyle = '#e11d48';
+  const pah = W2S({x: A + H, y: fah}); ctx.fillText('a+h', pah.x + 6, pah.y - 8);
+
+  // readouts
+  document.getElementById('sec').textContent = sec.toFixed(3);
+  document.getElementById('tan').textContent = tan.toFixed(3);
+  document.getElementById('err').textContent = Math.abs(sec - tan).toFixed(3);
+}
+
+// drag the anchor point 'a' horizontally
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  const mx = S2Wx(e.clientX - r.left);
+  if (Math.abs(mx - A) < 0.4) { drag = true; cv.setPointerCapture(e.pointerId); }
+});
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  A = Math.max(-2.5, Math.min(2.5, S2Wx(e.clientX - r.left)));
+  document.getElementById('a').value = A;
+  document.getElementById('av').textContent = A.toFixed(2);
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = false);
+
+function bindSlider(id, vid, set, fmt) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(+el.value); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('h', 'hv', x => H = x, v => v.toFixed(2));
+bindSlider('a', 'av', x => A = x, v => v.toFixed(2));
+
+document.getElementById('fsel').addEventListener('change', e => { cur = e.target.value; draw(); });
+document.getElementById('shrink').onclick = () => {
+  const el = document.getElementById('h');
+  const step = () => {
+    H = Math.max(0.01, H * 0.78);
+    el.value = H; document.getElementById('hv').textContent = H.toFixed(2); draw();
+    if (H > 0.02) requestAnimationFrame(() => setTimeout(step, 60));
+  };
+  step();
+};
+document.getElementById('reset').onclick = () => {
+  cur = 'sq'; H = 1.2; A = 1.0;
+  document.getElementById('fsel').value = 'sq';
+  document.getElementById('h').value = 1.2; document.getElementById('hv').textContent = '1.20';
+  document.getElementById('a').value = 1.0; document.getElementById('av').textContent = '1.00';
+  draw();
+};
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`f'(a)`, document.getElementById('fpdef'));
+    katex.render(String.raw`\frac{f(a+h)-f(a)}{h}`, document.getElementById('secdef'));
+    katex.render(String.raw`h\to 0`, document.getElementById('hlim'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

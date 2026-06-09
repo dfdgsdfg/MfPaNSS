@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>0. 곱의 미분 연습-09강 4기 23강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: crosshair; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">(강화된) 미분계산 연습과 나의 감상 나누기 (4기 영상)-09강 4기 23강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">0. 곱의 미분 연습</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    미분계수는 <b>세컨트(할선) 기울기의 극한</b> <span id="defeq"></span> 입니다.
+    오늘 드릴에 나온 함수 <span id="fdef"></span> 를 골라, 점 <span class="font-mono">a</span> 를 옮기고
+    간격 <span class="font-mono">h</span> 를 줄여 보세요. 빨간 <b class="text-rose-600">세컨트</b> 의 기울기가
+    초록 <b class="text-emerald-600">탄젠트</b> 의 기울기 <span class="font-mono">f′(a)</span> 로 수렴합니다.
+    그래프에 점을 찍거나 끌면 <span class="font-mono">a</span> 가 바뀝니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">함수 f(x)
+          <select id="fn" class="mt-1 w-full text-sm rounded border-slate-300 bg-slate-50 px-2 py-1"></select>
+        </label>
+        <label class="block text-sm">a (미분할 점) <span id="av" class="float-right font-mono text-slate-500"></span>
+          <input id="a" type="range" min="-3" max="3" step="0.05" value="1" class="w-full accent-emerald-600" /></label>
+        <label class="block text-sm">h (세컨트 간격) <span id="hv" class="float-right font-mono text-slate-500"></span>
+          <input id="h" type="range" min="0.01" max="2" step="0.01" value="1" class="w-full accent-rose-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="anim" class="text-xs px-2 py-1 rounded bg-emerald-100 hover:bg-emerald-200">h → 0 애니메이션</button>
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">리셋</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">세컨트 기울기</span><span id="sec" class="font-mono text-rose-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f′(a) (정확값)</span><span id="der" class="font-mono text-emerald-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">오차 |세컨트−f′(a)|</span><span id="err" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        세컨트 = <span class="font-mono">[f(a+h)−f(a)] / h</span>. h를 줄이면 빨간 직선이 초록 접선으로 포개집니다.
+        곱의 미분 <span class="font-mono">(uv)′=u′v+uv′</span> 로 손으로 구한 f′(a)와 맞춰 보세요.
+      </p>
+    </div>
+  </div>
+  <p class="mt-3 text-xs text-slate-400">f′(a)는 수치 미분(중심차분)이 아니라, 각 함수의 해석적 도함수를 직접 코드에 적어 계산합니다.</p>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+
+// note의 드릴 함수들: f, 해석적 도함수 f', 라벨(KaTeX)
+const FUNCS = [
+  { name: '(2x+1)·e^{x^2}',  tex: 'f(x)=(2x+1)e^{x^2}',
+    f: x => (2*x+1)*Math.exp(x*x),
+    df: x => 2*Math.exp(x*x) + (2*x+1)*Math.exp(x*x)*2*x },
+  { name: 'x·cos x',         tex: 'f(x)=x\\cos x',
+    f: x => x*Math.cos(x),
+    df: x => Math.cos(x) - x*Math.sin(x) },
+  { name: '(x^2+1)·sin x',   tex: 'f(x)=(x^2+1)\\sin x',
+    f: x => (x*x+1)*Math.sin(x),
+    df: x => 2*x*Math.sin(x) + (x*x+1)*Math.cos(x) },
+  { name: 'x^2·cos x',       tex: 'f(x)=x^2\\cos x',
+    f: x => x*x*Math.cos(x),
+    df: x => 2*x*Math.cos(x) - x*x*Math.sin(x) },
+  { name: 'sin(4x+1)',       tex: 'f(x)=\\sin(4x+1)',
+    f: x => Math.sin(4*x+1),
+    df: x => 4*Math.cos(4*x+1) },
+  { name: 'sin x + 2x (함정문제)', tex: 'f(x)=\\sin x + 2x',
+    f: x => Math.sin(x) + 2*x,
+    df: x => Math.cos(x) + 2 },
+];
+
+let fi = 1;                 // selected function index
+let a = 1.0, h = 1.0;
+let S = 60, anim = null;
+
+function cur() { return FUNCS[fi]; }
+
+function resize() {
+  const css = cv.clientWidth, ht = Math.max(320, Math.round(css * 0.78));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = ht * dpr;
+  cv.style.height = ht + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+// world: x in [-3.5,3.5]; y auto-scaled per function around a window
+function bounds() {
+  const xs = [];
+  for (let t = -3.5; t <= 3.5; t += 0.05) xs.push(cur().f(t));
+  let lo = Math.min(...xs), hi = Math.max(...xs);
+  if (!isFinite(lo) || !isFinite(hi)) { lo = -3; hi = 3; }
+  const pad = (hi - lo) * 0.12 + 0.5;
+  return { lo: lo - pad, hi: hi + pad };
+}
+let B = { lo: -3, hi: 3 };
+function W() { return cv.clientWidth; }
+function H() { return cv.height / (window.devicePixelRatio || 1); }
+function X2P(x) { return (x + 3.5) / 7 * W(); }
+function Y2P(y) { return H() - (y - B.lo) / (B.hi - B.lo) * H(); }
+function P2X(px) { return px / W() * 7 - 3.5; }
+
+function line(x1, y1, x2, y2, color, lw, dash) {
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.setLineDash(dash || []);
+  ctx.beginPath(); ctx.moveTo(X2P(x1), Y2P(y1)); ctx.lineTo(X2P(x2), Y2P(y2)); ctx.stroke();
+  ctx.setLineDash([]);
+}
+function dot(x, y, color, r) {
+  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(X2P(x), Y2P(y), r || 4, 0, 2*Math.PI); ctx.fill();
+}
+
+function draw() {
+  B = bounds();
+  ctx.clearRect(0, 0, W(), H());
+  // grid (integer x lines)
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -3; i <= 3; i++) line(i, B.lo, i, B.hi, '#eef2f7', 1);
+  // axes
+  if (B.lo < 0 && B.hi > 0) line(-3.5, 0, 3.5, 0, '#cbd5e1', 1.4);
+  line(0, B.lo, 0, B.hi, '#cbd5e1', 1.4);
+
+  // curve
+  ctx.strokeStyle = '#334155'; ctx.lineWidth = 2; ctx.beginPath();
+  let started = false;
+  for (let t = -3.5; t <= 3.5; t += 0.01) {
+    const y = cur().f(t);
+    if (!isFinite(y)) { started = false; continue; }
+    const px = X2P(t), py = Y2P(y);
+    started ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+    started = true;
+  }
+  ctx.stroke();
+
+  const fa = cur().f(a), fah = cur().f(a + h), dfa = cur().df(a);
+  const sec = (fah - fa) / h;
+
+  // tangent (green) across full width
+  line(-3.5, fa + dfa*(-3.5 - a), 3.5, fa + dfa*(3.5 - a), '#10b981', 2);
+  // secant (red) across full width
+  line(-3.5, fa + sec*(-3.5 - a), 3.5, fa + sec*(3.5 - a), '#e11d48', 1.8, [7, 4]);
+  // the two anchor points
+  dot(a, fa, '#0f172a', 6);
+  dot(a + h, fah, '#e11d48', 5);
+  // vertical gauge of h
+  ctx.strokeStyle = '#fecaca'; ctx.lineWidth = 1; ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(X2P(a+h), Y2P(fa)); ctx.lineTo(X2P(a+h), Y2P(fah)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // readouts
+  document.getElementById('sec').textContent = sec.toFixed(4);
+  document.getElementById('der').textContent = dfa.toFixed(4);
+  document.getElementById('err').textContent = Math.abs(sec - dfa).toFixed(4);
+}
+
+function bindSlider(id, vid, set, fmt) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(parseFloat(el.value)); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('a', 'av', v => a = v, v => v.toFixed(2));
+bindSlider('h', 'hv', v => h = v, v => v.toFixed(2));
+
+// function dropdown
+const sel = document.getElementById('fn');
+FUNCS.forEach((fobj, i) => {
+  const o = document.createElement('option'); o.value = i; o.textContent = fobj.name; sel.appendChild(o);
+});
+sel.value = fi;
+sel.addEventListener('change', () => { fi = parseInt(sel.value); renderTex(); draw(); });
+
+// drag a along the curve
+function setAFromPointer(e) {
+  const r = cv.getBoundingClientRect();
+  a = Math.max(-3, Math.min(3, P2X(e.clientX - r.left)));
+  document.getElementById('a').value = a;
+  document.getElementById('av').textContent = a.toFixed(2);
+  draw();
+}
+let dragging = false;
+cv.addEventListener('pointerdown', e => { dragging = true; cv.setPointerCapture(e.pointerId); setAFromPointer(e); });
+cv.addEventListener('pointermove', e => { if (dragging) setAFromPointer(e); });
+cv.addEventListener('pointerup', () => dragging = false);
+
+document.getElementById('anim').onclick = () => {
+  if (anim) { clearInterval(anim); anim = null; }
+  const hEl = document.getElementById('h'), hOut = document.getElementById('hv');
+  let val = 2.0; hEl.value = val;
+  anim = setInterval(() => {
+    val *= 0.92;
+    if (val < 0.01) { val = 0.01; clearInterval(anim); anim = null; }
+    h = val; hEl.value = val; hOut.textContent = val.toFixed(2); draw();
+  }, 60);
+};
+document.getElementById('reset').onclick = () => {
+  if (anim) { clearInterval(anim); anim = null; }
+  a = 1.0; h = 1.0;
+  document.getElementById('a').value = 1; document.getElementById('av').textContent = '1.00';
+  document.getElementById('h').value = 1; document.getElementById('hv').textContent = '1.00';
+  draw();
+};
+
+function renderTex() {
+  if (!window.katex) return;
+  katex.render(String.raw`f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}{h}`, document.getElementById('defeq'));
+  katex.render(cur().tex, document.getElementById('fdef'));
+}
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => { renderTex(); resize(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>4. 세트 C — 연쇄법칙-09강 4기 22강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">[직장인과 문과생을 위한 수학교실 4기] 22. 미분계산 연습과 나의 감상 나누기-09강 4기 22강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">4. 세트 C — 연쇄법칙</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    합성함수 <span id="compdef"></span> 의 미분은 연쇄법칙 <span id="chaindef"></span> — <b>바깥을 미분하고 안쪽의 미분을 곱합니다</b>.
+    안쪽 <b class="text-emerald-600">f</b> 와 바깥 <b class="text-blue-600">g</b> 를 고르고, 점 <b class="text-rose-600">x</b> 를 끌어 보세요.
+    안쪽이 만드는 기울기 <span class="font-mono">f'(x)</span> 와 바깥이 만드는 기울기 <span class="font-mono">g'(f(x))</span> 가
+    <b>곱해져서</b> 전체 기울기 <span class="font-mono">(g∘f)'(x)</span> 가 되는 것을 봅니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">안쪽 함수 f
+          <select id="fsel" class="w-full mt-1 text-sm rounded border-slate-300 accent-emerald-600">
+            <option value="lin">5x + 1</option>
+            <option value="sin">sin x</option>
+            <option value="sq">x²</option>
+            <option value="ln">ln x</option>
+          </select></label>
+        <label class="block text-sm">바깥 함수 g
+          <select id="gsel" class="w-full mt-1 text-sm rounded border-slate-300 accent-blue-600">
+            <option value="ln">ln u</option>
+            <option value="cos">cos u</option>
+            <option value="pow7">u⁷</option>
+            <option value="exp">eᵘ</option>
+          </select></label>
+        <label class="block text-sm">x <span id="xv" class="float-right font-mono text-slate-500"></span>
+          <input id="xr" type="range" min="-2" max="3" step="0.01" value="0.6" class="w-full accent-rose-600" /></label>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">u = f(x)</span><span id="u" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-emerald-600">f'(x)</span><span id="fp" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-blue-600">g'(f(x))</span><span id="gp" class="font-mono"></span></div>
+        <div class="flex justify-between border-t border-slate-200 pt-1"><span class="text-rose-600 font-semibold">(g∘f)'(x)</span><span id="chain" class="font-mono font-semibold"></span></div>
+        <div class="flex justify-between text-xs"><span class="text-slate-400">수치 검산</span><span id="num" class="font-mono text-slate-400"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        <span id="formula"></span><br />
+        붉은 점선 = 합성 곡선 <span class="font-mono">y=g(f(x))</span> 의 접선. 그 기울기가
+        <span class="font-mono">g'(f(x))·f'(x)</span> 와 정확히 같습니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+
+// inner f and outer g, each with value + derivative + KaTeX of its rule and chain formula
+const F = {
+  lin: { f: x => 5*x + 1,   fp: x => 5,          dom: x => true,    katex: "f(x)=5x+1,\\ f'(x)=5" },
+  sin: { f: x => Math.sin(x), fp: x => Math.cos(x), dom: x => true,  katex: "f(x)=\\sin x,\\ f'(x)=\\cos x" },
+  sq:  { f: x => x*x,       fp: x => 2*x,        dom: x => true,    katex: "f(x)=x^2,\\ f'(x)=2x" },
+  ln:  { f: x => Math.log(x), fp: x => 1/x,      dom: x => x > 0,   katex: "f(x)=\\ln x,\\ f'(x)=1/x" },
+};
+const G = {
+  ln:   { g: u => Math.log(u),  gp: u => 1/u,            dom: u => u > 0, katex: "g(u)=\\ln u,\\ g'(u)=1/u" },
+  cos:  { g: u => Math.cos(u),  gp: u => -Math.sin(u),   dom: u => true,  katex: "g(u)=\\cos u,\\ g'(u)=-\\sin u" },
+  pow7: { g: u => Math.pow(u,7),gp: u => 7*Math.pow(u,6),dom: u => true,  katex: "g(u)=u^7,\\ g'(u)=7u^6" },
+  exp:  { g: u => Math.exp(u),  gp: u => Math.exp(u),    dom: u => true,  katex: "g(u)=e^u,\\ g'(u)=e^u" },
+};
+
+let fk = 'lin', gk = 'ln', x0 = 0.6;
+let S = 60, drag = false;
+
+// world view: x in [-2.4,3.4], y auto-fit per composition is messy; use fixed comfortable window
+const VX = { lo: -2.4, hi: 3.4 };
+const VY = { lo: -3.2, hi: 3.2 };
+
+function comp(x) {
+  const f = F[fk], g = G[gk];
+  const u = f.f(x);
+  if (!f.dom(x) || !g.dom(u)) return NaN;
+  return g.g(u);
+}
+function chainSlope(x) {
+  const f = F[fk], g = G[gk];
+  const u = f.f(x);
+  if (!f.dom(x) || !g.dom(u)) return NaN;
+  return g.gp(u) * f.fp(x);
+}
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(330, Math.round(css * 0.8));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+function px(p) {
+  const w = cv.clientWidth, h = cv.height / (window.devicePixelRatio || 1);
+  return {
+    x: (p.x - VX.lo) / (VX.hi - VX.lo) * w,
+    y: h - (p.y - VY.lo) / (VY.hi - VY.lo) * h
+  };
+}
+function sx2world(sx) {
+  const w = cv.clientWidth;
+  return VX.lo + sx / w * (VX.hi - VX.lo);
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cv.height / (window.devicePixelRatio || 1);
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = Math.ceil(VX.lo); i <= VX.hi; i++) {
+    const a = px({x:i, y:VY.lo}), b = px({x:i, y:VY.hi});
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  for (let i = Math.ceil(VY.lo); i <= VY.hi; i++) {
+    const a = px({x:VX.lo, y:i}), b = px({x:VX.hi, y:i});
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let a = px({x:VX.lo,y:0}), b = px({x:VX.hi,y:0});
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  a = px({x:0,y:VY.lo}); b = px({x:0,y:VY.hi});
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+
+  // composition curve y = g(f(x))
+  ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  let pen = false;
+  for (let k = 0; k <= 600; k++) {
+    const xx = VX.lo + k/600 * (VX.hi - VX.lo);
+    const yy = comp(xx);
+    if (!isFinite(yy) || yy < VY.lo - 2 || yy > VY.hi + 2) { pen = false; continue; }
+    const p = px({x: xx, y: yy});
+    if (pen) ctx.lineTo(p.x, p.y); else { ctx.moveTo(p.x, p.y); pen = true; }
+  }
+  ctx.stroke();
+
+  // tangent at x0 with slope = chain slope
+  const y0 = comp(x0), m = chainSlope(x0);
+  if (isFinite(y0) && isFinite(m)) {
+    ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2; ctx.setLineDash([7,4]);
+    const xa = x0 - 1.4, xb = x0 + 1.4;
+    let pa = px({x: xa, y: y0 + m*(xa - x0)});
+    let pb = px({x: xb, y: y0 + m*(xb - x0)});
+    ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+    ctx.setLineDash([]);
+    // point
+    const p = px({x: x0, y: y0});
+    ctx.fillStyle = '#e11d48'; ctx.beginPath(); ctx.arc(p.x, p.y, 5.5, 0, 2*Math.PI); ctx.fill();
+    ctx.fillStyle = '#9f1239'; ctx.font = 'bold 13px ui-sans-serif';
+    ctx.fillText('x = ' + x0.toFixed(2), p.x + 9, p.y - 9);
+  }
+  // x marker on axis
+  const xp = px({x: x0, y: 0});
+  ctx.strokeStyle = '#fb7185'; ctx.lineWidth = 1.5; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(xp.x, px({x:0,y:VY.lo}).y); ctx.lineTo(xp.x, px({x:0,y:VY.hi}).y); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#475569'; ctx.font = '12px ui-sans-serif';
+  ctx.fillText('y = g(f(x))', 8, 16);
+
+  updateReadouts();
+}
+
+function fmt(v) { return isFinite(v) ? v.toFixed(3) : '정의 안 됨'; }
+
+function updateReadouts() {
+  const f = F[fk], g = G[gk];
+  const u = f.f(x0);
+  const fp = f.dom(x0) ? f.fp(x0) : NaN;
+  const gp = (f.dom(x0) && g.dom(u)) ? g.gp(u) : NaN;
+  const m = chainSlope(x0);
+  document.getElementById('u').textContent  = fmt(u);
+  document.getElementById('fp').textContent = fmt(fp);
+  document.getElementById('gp').textContent = fmt(gp);
+  document.getElementById('chain').textContent = fmt(m);
+  // numeric check via central difference of the composition
+  const eps = 1e-4;
+  const num = (comp(x0 + eps) - comp(x0 - eps)) / (2*eps);
+  document.getElementById('num').textContent = isFinite(num) ? num.toFixed(3) : '—';
+  document.getElementById('xv').textContent = x0.toFixed(2);
+  if (window.katex) {
+    katex.render(String.raw`${F[fk].katex},\quad ${G[gk].katex}`,
+      document.getElementById('formula'), { throwOnError: false });
+  }
+}
+
+// drag the point along the curve (x controls)
+function pickAt(clientX) {
+  const r = cv.getBoundingClientRect();
+  x0 = Math.max(VX.lo + 0.05, Math.min(VX.hi - 0.05, sx2world(clientX - r.left)));
+  document.getElementById('xr').value = x0;
+  draw();
+}
+cv.addEventListener('pointerdown', e => { drag = true; cv.setPointerCapture(e.pointerId); pickAt(e.clientX); });
+cv.addEventListener('pointermove', e => { if (drag) pickAt(e.clientX); });
+cv.addEventListener('pointerup',   () => drag = false);
+
+document.getElementById('xr').addEventListener('input', e => { x0 = parseFloat(e.target.value); draw(); });
+document.getElementById('fsel').addEventListener('change', e => { fk = e.target.value; draw(); });
+document.getElementById('gsel').addEventListener('change', e => { gk = e.target.value; draw(); });
+
+function renderStatic() {
+  if (!window.katex) return;
+  katex.render(String.raw`g\circ f`, document.getElementById('compdef'), { throwOnError: false });
+  katex.render(String.raw`(g\circ f)'(x)=g'(f(x))\,f'(x)`, document.getElementById('chaindef'), { throwOnError: false });
+}
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => { renderStatic(); resize(); });
+</script>
+</body>
+</html>

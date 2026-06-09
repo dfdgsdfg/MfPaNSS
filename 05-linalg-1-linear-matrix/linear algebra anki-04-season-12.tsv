@@ -1,0 +1,36 @@
+#separator:tab
+#html:true
+#notetype:Basic
+#columns:Front	Back	Tags
+완전제곱(completing the square)으로 다음 2차 방정식의 근의 공식을 유도하시오. (\( a\neq 0 \))<br>\[ ax^2+bx+c=0 \]	\( x=\dfrac{-b\pm\sqrt{b^2-4ac}}{2a} \)<br>\( a \)로 묶어 \( a\left(x^2+\frac{b}{a}x\right)+c=0 \), 완전제곱으로 \( a\left(x+\frac{b}{2a}\right)^2+c-\frac{b^2}{4a}=0 \), 정리하면 \( \left(x+\frac{b}{2a}\right)^2=\frac{b^2-4ac}{4a^2} \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 근의공식
+두 \( 2\times2 \) 행렬 \( A,B \)에 대해 \( \det(AB) \)와 \( \det A\cdot\det B \)의 관계를 손으로 확인하시오.	\( \det(AB)=\det A\cdot\det B \)<br>\( A=\begin{pmatrix}a&b\\c&d\end{pmatrix} \)이면 \( \det A=ad-bc \). 두 행렬을 곱한 뒤 행렬식을 취한 것과 각각의 행렬식을 곱한 것이 항등적으로 같다(군구조의 관찰).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 행렬식
+\( 2^7 \) 은?	\( 128 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^{10} \) 은?	\( 1024 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^5 \) 은?	\( 32 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^6 \) 은?	\( 64 \)<br>\( 2^4=16 \)에서 \( 2 \)를 두 번 더 곱해 \( 64 \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^2 \) 은?	\( 4 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^9 \) 은?	\( 512 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^{-1} \) 은?	\( \dfrac{1}{2} \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+\( 2^{-3} \) 은?	\( \dfrac{1}{8} \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 거듭제곱
+곱셈공식으로 암산하시오.<br>\( 13^2 \)	\( 169 \)<br>\( (10+3)^2=100+2\cdot10\cdot3+9=169 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식으로 암산하시오.<br>\( 11^2 \)	\( 121 \)<br>\( (10+1)^2=100+2\cdot10\cdot1+1=121 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식으로 암산하시오.<br>\( 12^2 \)	\( 144 \)<br>\( (10+2)^2=100+2\cdot10\cdot2+4=144 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식으로 암산하시오.<br>\( 99^2 \)	\( 9801 \)<br>\( (100-1)^2=10000-200+1=9801 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식으로 암산하시오.<br>\( 98^2 \)	\( 9604 \)<br>\( (100-2)^2=10000-400+4=9604 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식으로 암산하시오.<br>\( 97^2 \)	\( 9409 \)<br>\( (100-3)^2=10000-600+9=9409 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식 \( (a+b)(a-b)=a^2-b^2 \)으로 암산하시오.<br>\( 11\times9 \)	\( 99 \)<br>\( (10+1)(10-1)=100-1=99 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+곱셈공식 \( (a+b)(a-b)=a^2-b^2 \)으로 암산하시오.<br>\( 102\times98 \)	\( 9996 \)<br>\( (100+2)(100-2)=10000-4=9996 \)	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 곱셈공식
+풀어쓰지 말고 한 줄로 전개하시오.<br>\( (x+1)(x+2)(x+3) \)	\( x^3+6x^2+11x+6 \)<br>\( x^2 \)계수 \( 1+2+3=6 \), \( x \)계수 \( 1\cdot2+2\cdot3+3\cdot1=11 \), 상수 \( 1\cdot2\cdot3=6 \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 다항식전개
+풀어쓰지 말고 한 줄로 전개하시오.<br>\( (x+1)(x-2)(x+3) \)	\( x^3+2x^2-5x-6 \)<br>\( x^2 \)계수 \( 1-2+3=2 \), \( x \)계수 \( (1)(-2)+(-2)(3)+(3)(1)=-5 \), 상수 \( (1)(-2)(3)=-6 \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 다항식전개
+풀어쓰지 말고 한 줄로 전개하시오.<br>\( (x+1)(x-2)(x-3) \)	\( x^3-4x^2+x+6 \)<br>\( x^2 \)계수 \( 1-2-3=-4 \), \( x \)계수 \( (1)(-2)+(-2)(-3)+(-3)(1)=1 \), 상수 \( (1)(-2)(-3)=6 \).<br>※ 영상 자막의 구술 답(−5x·2x−6)은 잘못, 계산상 \( x^3-4x^2+x+6 \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 계산 다항식전개
+함수의 정의를 (세 줄로) 정확히 진술하시오.	두 집합 \( A,B \)가 있을 때, 그 곱집합 \( A\times B \)(순서쌍들의 모임)를 생각하고, 그 \( A\times B \)의 특정 부분집합을 함수라고 부른다. 단, 이 부분집합은 두 조건을 만족해야 한다.<br>(1) 존재성: 각 \( a\in A \)마다 어떤 \( b\in B \)가 존재해 \( (a,b) \)가 이 집합에 들어간다. (2) 유일성: 그 \( b \)가 유일하다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+함수의 정의에서 둘째(유일성) 조건을 well-defined 형태(함숫값으로)로 다시 진술하시오.	\( (a,b),(a,b')\)가 모두 함수 집합에 들어가면 \( b=b' \)이다 — 즉 \( f(a)=f(a') \)가 되도록 함숫값이 유일하게 정해진다(well-defined). 그래서 그 \( y \)성분을 "함숫값"이라 부를 수 있다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+단사(injective) 함수의 정의를 진술하시오. (\( f:A\to B \) 주어짐)	\( A \)의 서로 다른 두 원소의 함숫값은 서로 다르다.<br>\( a\neq a' \Rightarrow f(a)\neq f(a') \). 대우로는 \( f(a)=f(a')\Rightarrow a=a' \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+전사(surjective, onto) 함수의 정의를 진술하시오. (\( f:A\to B \) 주어짐)	치역과 공역이 같다(치역 \( =B \)).<br>형식적으로: \( \forall\, b\in B,\ \exists\, a\in A \ \text{s.t.}\ f(a)=b \).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+일대일 대응(전단사)의 정의를 진술하시오.	함수 \( f:A\to B \)가 단사이면서 동시에 전사일 때, \( f \)를 일대일 대응(전단사)이라 한다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+\( 2\times2 \) 행렬의 행렬식의 정의를 (말로) 정확히 진술하시오.	\( 2\times2 \) 행렬 \( \begin{pmatrix}a&b\\c&d\end{pmatrix} \)에 대하여 행렬식은 \( ad-bc \)이다.<br>※ "행렬식은 \( ad-bc \)"라고만 하면 틀린 진술 — 어느 크기의 행렬인지(\( 2\times2 \))를 반드시 밝혀야 한다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+행렬식이 만족하는 군구조 관련 성질을 진술하고, 그 의미를 말하시오.	두 행렬 \( A,B \)에 대해 \( \det(AB)=\det A\cdot\det B \).<br>곱한 뒤 행렬식을 취한 것과 각각의 행렬식을 곱한 것이 같다는 관찰로, 지수법칙 \( a^{x+y}=a^x a^y \)와 같은 관점의 군구조 보존 성질이다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정리
+대칭군의 정의를 진술하시오.	자연수 \( n \)을 고정하고 \( A=B=\{1,2,\dots,n\} \)로 둘 때, 이 위의 일대일 대응 함수들의 모임을 (\( n \)차) 대칭군이라 한다.<br>여기에 함수의 합성을 연산으로 주면 군이 된다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+대칭군이 군을 이룸은 어떤 구조의 대응으로 확인되는가? (또한 역사적 의의는?)	일대일 대응 함수들의 모임에 함수의 합성을 연산으로 주면 결합법칙·항등원(항등함수)·역원(역함수)이 성립해 군이 된다. 이 대칭군을 다루는 과정에서 갈루아·아벨의 5차 이상 방정식 근의 공식 부재 논증의 오리지널 발상이 나온다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정리
+"기초적(elementary)"과 "뻔한(trivial)"의 차이를 설명하시오.	둘은 완전히 다르다. 여기서 다루는 대상은 모두 기초적·초등적이지만 그 어떤 것도 뻔하지 않다. "기초적"이란 어떤 고급 수학을 배우더라도 결국 다 이리로 떨어진다는 의미다.	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의
+식 \( ax^2+bx+c \)와 방정식 \( ax^2+bx+c=0 \)의 차이, 그리고 근의 공식 유도에서 \( a\neq0 \) 조건이 필요한 이유를 말하시오.	식은 표현일 뿐이고 "\( =0 \)"을 말해야 비로소 방정식을 선언한 것이다. 또한 \( a\neq0 \)이어야 2차 방정식이며, 이 조건이 빠지면 2차가 아니게 된다(완전제곱 유도에서 \( a \)로 묶고 나누는 단계가 성립하려면 필요).	MfPaNSS 04-season-12 05-Linalg-1-linear-matrix ko-kr 암기 정의

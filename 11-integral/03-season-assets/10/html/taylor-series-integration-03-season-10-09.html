@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>09. FTC와 테일러 급수: 원시함수를 몰라도 적분하기-11강 3기 10강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: ew-resize; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">테일러 급수와 미적분학에 대한 디스커션-11강 3기 10강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">9. FTC와 테일러 급수: 원시함수를 몰라도 적분하기</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    <span id="fdef"></span> 의 원시함수는 초등함수가 아닙니다. 하지만 테일러 전개
+    <span id="series"></span> 를 <b>항별 적분</b>하면 정적분
+    <span id="intdef"></span> 을 급수로 근사할 수 있습니다.
+    슬라이더로 항 수 <span class="font-mono">K</span> 를, 그리고 상한 <b class="text-blue-600">b</b> 를 바꾸며
+    (캔버스를 좌우로 끌어도 됩니다) 부분합이 참값으로 어떻게 수렴하는지 보세요.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_250px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">K (테일러 항 수) <span id="kv" class="float-right font-mono text-slate-500"></span>
+          <input id="k" type="range" min="0" max="10" step="1" value="3" class="w-full accent-blue-600" /></label>
+        <label class="block text-sm">b (적분 상한) <span id="bv" class="float-right font-mono text-slate-500"></span>
+          <input id="b" type="range" min="0.2" max="2" step="0.05" value="1" class="w-full accent-blue-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">리셋 (K=3, b=1)</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">참값 ∫₀ᵇ</span><span id="true" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">급수 부분합</span><span id="approx" class="font-mono text-blue-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">오차 |차이|</span><span id="err" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">마지막 항</span><span id="lastterm" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        검은 곡선이 참함수 <span class="font-mono">e<sup>−x²</sup></span>, 파란 곡선이 <span class="font-mono">K</span>차 테일러 근사,
+        파란 칠은 항별 적분으로 얻은 넓이입니다. 교대급수라 오차는 보통 첫 버린 항보다 작습니다.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-4 bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm text-slate-600 leading-relaxed">
+    <p id="formula" class="text-center my-1"></p>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let K = 3, B = 1.0;
+let drag = false;
+
+// factorial table (k up to ~12 is plenty)
+const fact = (() => { const f = [1]; for (let k = 1; k <= 20; k++) f[k] = f[k-1]*k; return f; })();
+
+// true f(x) = e^{-x^2}
+const fTrue = x => Math.exp(-x*x);
+// Taylor partial sum of e^{-x^2} up to k=K:  sum_{k=0}^{K} (-1)^k x^{2k} / k!
+function fTaylor(x) {
+  let s = 0;
+  for (let k = 0; k <= K; k++) s += Math.pow(-1, k) * Math.pow(x, 2*k) / fact[k];
+  return s;
+}
+// term-by-term integral of e^{-x^2} on [0,b]: sum_{k=0}^{K} (-1)^k b^{2k+1} / (k!(2k+1))
+function integralApprox(b) {
+  let s = 0;
+  for (let k = 0; k <= K; k++) s += Math.pow(-1, k) * Math.pow(b, 2*k+1) / (fact[k]*(2*k+1));
+  return s;
+}
+function lastTermValue(b) {
+  const k = K;
+  return Math.pow(-1, k) * Math.pow(b, 2*k+1) / (fact[k]*(2*k+1));
+}
+// accurate "true" integral via fine Simpson rule
+function integralTrue(b) {
+  const n = 1000, h = b/n;
+  let s = fTrue(0) + fTrue(b);
+  for (let i = 1; i < n; i++) s += (i % 2 ? 4 : 2) * fTrue(i*h);
+  return s * h / 3;
+}
+
+// plot window: x in [0, 2], y in [-0.6, 1.4]
+const X0 = 0, X1 = 2, Y0 = -0.6, Y1 = 1.4;
+let PAD = 36;
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(300, Math.round(css * 0.66));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+function px(x) { const w = cv.clientWidth; return PAD + (x - X0)/(X1 - X0) * (w - 2*PAD); }
+function py(y) { const h = cv.height/(window.devicePixelRatio||1); return (h - PAD) - (y - Y0)/(Y1 - Y0) * (h - 2*PAD); }
+function sx2x(sx) { const w = cv.clientWidth; return X0 + (sx - PAD)/(w - 2*PAD) * (X1 - X0); }
+
+function draw() {
+  const w = cv.clientWidth, h = cv.height/(window.devicePixelRatio||1);
+  ctx.clearRect(0, 0, w, h);
+
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let gx = 0; gx <= 2; gx += 0.5) {
+    ctx.beginPath(); ctx.moveTo(px(gx), py(Y0)); ctx.lineTo(px(gx), py(Y1)); ctx.stroke();
+  }
+  for (let gy = -0.5; gy <= 1.0; gy += 0.5) {
+    ctx.beginPath(); ctx.moveTo(px(X0), py(gy)); ctx.lineTo(px(X1), py(gy)); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(px(X0), py(0)); ctx.lineTo(px(X1), py(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px(0), py(Y0)); ctx.lineTo(px(0), py(Y1)); ctx.stroke();
+  ctx.fillStyle = '#64748b'; ctx.font = '11px ui-sans-serif';
+  ctx.fillText('1', px(1)-3, py(0)+14); ctx.fillText('2', px(2)-3, py(0)+14);
+  ctx.fillText('1', px(0)-12, py(1)+4);
+
+  // shaded area under the TAYLOR approximation on [0, B] (term-by-term integral region)
+  ctx.fillStyle = 'rgba(37,99,235,0.18)';
+  ctx.beginPath(); ctx.moveTo(px(0), py(0));
+  for (let i = 0; i <= 200; i++) { const x = B*i/200; ctx.lineTo(px(x), py(fTaylor(x))); }
+  ctx.lineTo(px(B), py(0)); ctx.closePath(); ctx.fill();
+
+  // true curve
+  ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 2.4; ctx.beginPath();
+  for (let i = 0; i <= 300; i++) { const x = X0 + (X1-X0)*i/300; const p = {x:px(x),y:py(fTrue(x))}; i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); }
+  ctx.stroke();
+
+  // taylor curve (clamped to visible band)
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2; ctx.setLineDash([5,3]); ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= 300; i++) {
+    const x = X0 + (X1-X0)*i/300; let y = fTaylor(x);
+    if (y < Y0 - 0.3 || y > Y1 + 0.3) { started = false; continue; }
+    const p = {x:px(x),y:py(y)}; started?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y); started = true;
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+
+  // upper-limit handle b
+  ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 1.5; ctx.setLineDash([2,3]);
+  ctx.beginPath(); ctx.moveTo(px(B), py(Y0)); ctx.lineTo(px(B), py(Y1)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = '#1d4ed8'; ctx.beginPath(); ctx.arc(px(B), py(0), 6, 0, 2*Math.PI); ctx.fill();
+  ctx.font = 'bold 12px ui-sans-serif'; ctx.fillText('b', px(B)+8, py(Y1)+14);
+
+  // labels
+  ctx.fillStyle = '#0f172a'; ctx.font = '12px ui-sans-serif'; ctx.fillText('e^(-x^2)', px(0.05), py(fTrue(0.05))-8);
+  ctx.fillStyle = '#2563eb'; ctx.fillText('K-term Taylor', px(1.05), py(fTaylor(1.05) > Y1 ? Y1 : fTaylor(1.05))+14);
+
+  // readouts
+  const tv = integralTrue(B), ap = integralApprox(B), lt = lastTermValue(B);
+  document.getElementById('true').textContent     = tv.toFixed(6);
+  document.getElementById('approx').textContent    = ap.toFixed(6);
+  document.getElementById('err').textContent       = Math.abs(tv - ap).toExponential(2);
+  document.getElementById('lastterm').textContent  = lt.toExponential(2);
+
+  if (window.katex) {
+    katex.render(String.raw`\int_0^{${B.toFixed(2)}} e^{-x^2}\,dx \;\approx\; \sum_{k=0}^{${K}}\frac{(-1)^k\,(${B.toFixed(2)})^{2k+1}}{k!\,(2k+1)} \;=\; ${ap.toFixed(6)}`,
+      document.getElementById('formula'), {throwOnError:false});
+  }
+}
+
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  const x = sx2x(e.clientX - r.left);
+  if (Math.abs(x - B) < 0.15) { drag = true; cv.setPointerCapture(e.pointerId); }
+});
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  let x = sx2x(e.clientX - r.left);
+  x = Math.max(0.2, Math.min(2, x));
+  B = Math.round(x/0.05)*0.05;
+  document.getElementById('b').value = B.toFixed(2);
+  document.getElementById('bv').textContent = B.toFixed(2);
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = false);
+
+function bindSlider(id, vid, set, fmt) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(+el.value); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('k', 'kv', x => K = x, v => v.toFixed(0));
+bindSlider('b', 'bv', x => B = x, v => v.toFixed(2));
+document.getElementById('reset').onclick = () => {
+  K = 3; B = 1.0;
+  document.getElementById('k').value = 3; document.getElementById('kv').textContent = '3';
+  document.getElementById('b').value = 1; document.getElementById('bv').textContent = '1.00';
+  draw();
+};
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`f(x)=e^{-x^2}`, document.getElementById('fdef'), {throwOnError:false});
+    katex.render(String.raw`e^{-x^2}=\sum_{k=0}^{\infty}\frac{(-1)^k}{k!}x^{2k}`, document.getElementById('series'), {throwOnError:false});
+    katex.render(String.raw`\int_0^{b} e^{-x^2}\,dx`, document.getElementById('intdef'), {throwOnError:false});
+  }
+  resize();
+});
+</script>
+</body>
+</html>

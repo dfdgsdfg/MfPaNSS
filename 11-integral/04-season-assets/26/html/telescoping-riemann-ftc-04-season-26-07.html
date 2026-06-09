@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>07. 미분가능한 함수에 적용 — 미적분학의 기본정리-11강 4기 26강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">적분의 욕망과 미적분학의 기본정리 (4기 영상)-11강 4기 26강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">07. 미분가능한 함수에 적용 — 미적분학의 기본정리</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    구간 <span class="font-mono">[a,b]</span> 를 <span class="font-mono">n</span> 칸으로 쪼개고, 각 칸에서
+    <b class="text-emerald-600">망원경 막대</b> <span id="teledef"></span> 를 쌓으면 (중간이 캔슬되어) 항상
+    <span id="diffdef"></span> 입니다 — <b>칸 수와 무관</b>.
+    동시에 <b class="text-blue-600">리만 합</b> <span id="riemdef"></span> 은 칸을 잘게 쪼갤수록
+    <span id="intdef"></span> 로 수렴합니다.
+    슬라이더로 <span class="font-mono">n</span> 을 키워 두 값이 같은 곳으로 모이는 것을 보세요 — 이것이 FTC입니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">n (칸 수) <span id="nv" class="float-right font-mono text-slate-500"></span>
+          <input id="n" type="range" min="1" max="60" step="1" value="6" class="w-full accent-blue-600" /></label>
+        <div class="text-sm text-slate-600">함수 <span class="font-mono">f</span></div>
+        <div class="flex flex-wrap gap-2">
+          <button data-f="cubic"  class="fbtn text-xs px-2 py-1 rounded bg-blue-100 hover:bg-blue-200">x³/3 − x</button>
+          <button data-f="sin"    class="fbtn text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">sin x</button>
+          <button data-f="exp"    class="fbtn text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">e^(x/2)</button>
+        </div>
+        <p class="text-xs text-slate-500">막대 위 끝을 끌어 <span class="font-mono">a, b</span> 도 바꿀 수 있어요.</p>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-emerald-600">Σ 망원경</span><span id="tele" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f(b) − f(a)</span><span id="diff" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-blue-600">Σ f′·Δx (리만)</span><span id="riem" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-rose-600">∫ₐᵇ f′ dx</span><span id="exact" class="font-mono"></span></div>
+        <div class="flex justify-between border-t pt-1"><span class="text-slate-500">리만 오차</span><span id="err" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        망원경 합은 <span class="font-mono">n</span> 에 상관없이 정확히 <span class="font-mono">f(b)−f(a)</span> 와 같고,
+        리만 합은 <span class="font-mono">n→∞</span> 에서 <span class="font-mono">∫ f′</span> 로 수렴 — 둘이 만나는 값이 같다는 것이 핵심입니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let N = 6;
+let a = 1.0, b = 4.0;
+let drag = null;                                         // 'a' | 'b' | null
+
+// f and its derivative fp
+const FUNCS = {
+  cubic: { f: x => x*x*x/3 - x,        fp: x => x*x - 1,            label: 'x^3/3 - x' },
+  sin:   { f: x => Math.sin(x),        fp: x => Math.cos(x),        label: 'sin x' },
+  exp:   { f: x => Math.exp(x/2),      fp: x => 0.5*Math.exp(x/2),  label: 'e^(x/2)' },
+};
+let cur = 'cubic';
+
+// world view recomputed from current f over a generous x range
+function viewBounds() {
+  const f = FUNCS[cur].f;
+  const xs = [], ys = [];
+  for (let i = 0; i <= 120; i++) { const x = -0.5 + i/120 * 6.5; xs.push(x); ys.push(f(x)); }
+  let ymin = Math.min(...ys), ymax = Math.max(...ys);
+  const pad = (ymax - ymin) * 0.12 + 0.3;
+  return { xmin: -0.5, xmax: 6.0, ymin: ymin - pad, ymax: ymax + pad };
+}
+let VB = viewBounds();
+
+let S = 70, PADL = 38, PADB = 26, PADT = 12, PADR = 12;
+function resize() {
+  const css = cv.clientWidth, h = Math.max(300, Math.round(css * 0.72));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+function plotW() { return cv.clientWidth - PADL - PADR; }
+function plotH() { return (cv.height / (window.devicePixelRatio||1)) - PADT - PADB; }
+function X2S(x) { return PADL + (x - VB.xmin) / (VB.xmax - VB.xmin) * plotW(); }
+function Y2S(y) { return PADT + (VB.ymax - y) / (VB.ymax - VB.ymin) * plotH(); }
+function S2X(sx) { return VB.xmin + (sx - PADL) / plotW() * (VB.xmax - VB.xmin); }
+
+function compute() {
+  const { f, fp } = FUNCS[cur];
+  let tele = 0, riem = 0;
+  for (let k = 0; k < N; k++) {
+    const x0 = a + (b - a) * k / N, x1 = a + (b - a) * (k + 1) / N;
+    tele += f(x1) - f(x0);                 // telescopes exactly to f(b)-f(a)
+    riem += fp(x0) * (x1 - x0);            // left Riemann sum of f'
+  }
+  return { tele, riem, diff: f(b) - f(a), exact: f(b) - f(a) };  // exact integral of f' = f(b)-f(a)
+}
+
+function draw() {
+  const f = FUNCS[cur].f;
+  const w = cv.clientWidth, h = cv.height / (window.devicePixelRatio||1);
+  ctx.clearRect(0, 0, w, h);
+
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(X2S(VB.xmin), Y2S(0)); ctx.lineTo(X2S(VB.xmax), Y2S(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(X2S(0), Y2S(VB.ymin)); ctx.lineTo(X2S(0), Y2S(VB.ymax)); ctx.stroke();
+
+  // curve f
+  ctx.strokeStyle = '#1f2937'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i <= 300; i++) {
+    const x = VB.xmin + i/300 * (VB.xmax - VB.xmin), p = { x: X2S(x), y: Y2S(f(x)) };
+    i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+  }
+  ctx.stroke();
+
+  // telescoping bars: each rises from f(x_k) to f(x_{k+1}) at x_{k+1}
+  for (let k = 0; k < N; k++) {
+    const x0 = a + (b - a) * k / N, x1 = a + (b - a) * (k + 1) / N;
+    const y0 = f(x0), y1 = f(x1);
+    ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(X2S(x0), Y2S(y0)); ctx.lineTo(X2S(x1), Y2S(y0)); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = '#10b981'; ctx.lineWidth = Math.max(2, 26 / N);
+    ctx.beginPath(); ctx.moveTo(X2S(x1), Y2S(y0)); ctx.lineTo(X2S(x1), Y2S(y1)); ctx.stroke();
+  }
+  // partition points on the curve
+  ctx.fillStyle = '#1f2937';
+  for (let k = 0; k <= N; k++) {
+    const xk = a + (b - a) * k / N;
+    ctx.beginPath(); ctx.arc(X2S(xk), Y2S(f(xk)), 2.4, 0, 2*Math.PI); ctx.fill();
+  }
+
+  // a and b draggable handles
+  for (const [name, xv] of [['a', a], ['b', b]]) {
+    ctx.fillStyle = name === 'a' ? '#2563eb' : '#e11d48';
+    ctx.beginPath(); ctx.arc(X2S(xv), Y2S(f(xv)), 6, 0, 2*Math.PI); ctx.fill();
+    ctx.font = 'bold 13px ui-sans-serif';
+    ctx.fillText(name + ' = ' + xv.toFixed(2), X2S(xv) - 10, Y2S(f(xv)) - 12);
+  }
+  // f label
+  ctx.fillStyle = '#1f2937'; ctx.font = '12px ui-sans-serif';
+  ctx.fillText('f(x) = ' + FUNCS[cur].label, X2S(VB.xmin) + 6, Y2S(VB.ymax) + 14);
+
+  // readouts
+  const r = compute();
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  set('tele',  r.tele.toFixed(4));
+  set('diff',  r.diff.toFixed(4));
+  set('riem',  r.riem.toFixed(4));
+  set('exact', r.exact.toFixed(4));
+  set('err',   Math.abs(r.riem - r.exact).toExponential(2));
+  document.getElementById('nv').textContent = N;
+}
+
+// drag a / b along x (clamped, kept apart)
+function pickHandle(e) {
+  const rect = cv.getBoundingClientRect();
+  const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+  const f = FUNCS[cur].f;
+  const da = Math.hypot(sx - X2S(a), sy - Y2S(f(a)));
+  const db = Math.hypot(sx - X2S(b), sy - Y2S(f(b)));
+  drag = (da < 16 && da <= db) ? 'a' : (db < 16) ? 'b' : null;
+}
+cv.addEventListener('pointerdown', e => { pickHandle(e); if (drag) cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const rect = cv.getBoundingClientRect();
+  let nx = Math.max(VB.xmin + 0.1, Math.min(VB.xmax - 0.1, S2X(e.clientX - rect.left)));
+  if (drag === 'a') a = Math.min(nx, b - 0.3);
+  else              b = Math.max(nx, a + 0.3);
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = null);
+
+document.getElementById('n').addEventListener('input', e => { N = parseInt(e.target.value); draw(); });
+document.querySelectorAll('.fbtn').forEach(btn => btn.addEventListener('click', () => {
+  cur = btn.dataset.f;
+  document.querySelectorAll('.fbtn').forEach(x => x.className = x.className.replace('bg-blue-100 hover:bg-blue-200', 'bg-slate-100 hover:bg-slate-200'));
+  btn.className = btn.className.replace('bg-slate-100 hover:bg-slate-200', 'bg-blue-100 hover:bg-blue-200');
+  VB = viewBounds();
+  if (a < VB.xmin + 0.1) a = VB.xmin + 0.1;
+  if (b > VB.xmax - 0.1) b = VB.xmax - 0.1;
+  draw();
+}));
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    const K = (s, id) => katex.render(s, document.getElementById(id));
+    K(String.raw`f(x_k)-f(x_{k-1})`, 'teledef');
+    K(String.raw`\sum_k\big(f(x_k)-f(x_{k-1})\big)=f(b)-f(a)`, 'diffdef');
+    K(String.raw`\sum_k f'(x_{k-1})\,\Delta x`, 'riemdef');
+    K(String.raw`\int_a^b f'(x)\,dx`, 'intdef');
+  }
+  resize();
+});
+</script>
+</body>
+</html>

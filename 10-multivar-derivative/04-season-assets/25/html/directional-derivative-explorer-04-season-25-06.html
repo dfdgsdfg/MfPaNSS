@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>06. 방향미분과 함정 — 직선만으로는 부족하다-10강 4기 25강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; }
+  #plane { cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-4xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">다변수 미분가능성의 심상-10강 4기 25강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">06. 방향미분과 함정 — 직선만으로는 부족하다</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    원점 $P=(0,0)$ 으로 다가가는 <b>방향 <span class="text-blue-600">d</span></b> 를 왼쪽 평면에서 끌어 보세요(자동으로 크기 1로 정규화됩니다).
+    오른쪽은 그 방향을 따라 자른 단면 곡선 $t\mapsto f(P+t\,\mathbf{d})$ 와, 거기에 그은 할선/접선입니다.
+    함수를 <b>매끈한 곡면</b> 과 <b>노트의 반례</b>(<span id="cedef"></span>: $y$축에서 0, 그 밖 1) 사이에서 바꿔 보세요 —
+    반례에서는 <b>모든 직선 방향미분이 0</b> 인데도 <b class="text-rose-600">휘어진 경로</b> 가 불연속을 드러냅니다.
+  </p>
+
+  <div class="mt-4 flex flex-wrap gap-2 items-center">
+    <div class="inline-flex rounded-lg overflow-hidden ring-1 ring-slate-300 text-sm">
+      <button id="fSmooth" class="px-3 py-1.5 bg-blue-600 text-white">매끈한 곡면</button>
+      <button id="fCounter" class="px-3 py-1.5 bg-white hover:bg-slate-100">노트의 반례</button>
+    </div>
+    <label class="text-sm flex items-center gap-2 ml-1">접근 거리 t
+      <input id="tlen" type="range" min="0.05" max="1.6" step="0.01" value="0.8" class="w-40 accent-blue-600" />
+      <span id="tv" class="font-mono text-slate-500 w-10"></span></label>
+    <label id="curveWrap" class="text-sm flex items-center gap-2 ml-1">휘어짐 c
+      <input id="curve" type="range" min="0" max="1" step="0.01" value="0" class="w-32 accent-rose-600" />
+      <span id="cv" class="font-mono text-slate-500 w-9"></span></label>
+  </div>
+
+  <div class="mt-4 grid md:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <div class="px-2 pt-1 text-xs text-slate-500">정의역 평면 (xy) — 빨강은 휘어진 경로</div>
+      <canvas id="plane" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <div class="px-2 pt-1 text-xs text-slate-500">방향 단면 곡선 t ↦ f(P+t·d) 와 할선→접선</div>
+      <canvas id="slice" class="w-full rounded-lg"></canvas>
+    </div>
+  </div>
+
+  <div class="mt-4 grid sm:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+      <div class="flex justify-between"><span class="text-slate-500">방향 d (단위벡터)</span><span id="dvec" class="font-mono"></span></div>
+      <div class="flex justify-between"><span class="text-slate-500">각도 θ</span><span id="theta" class="font-mono"></span></div>
+      <div class="flex justify-between"><span class="text-slate-500">할선 기울기 (거리 t)</span><span id="sec" class="font-mono"></span></div>
+      <div class="flex justify-between"><span class="text-slate-500">방향미분 D_d f(P) = lim</span><span id="dd" class="font-mono"></span></div>
+      <div class="flex justify-between"><span class="text-slate-500">⟨∇f(P), d⟩</span><span id="gd" class="font-mono"></span></div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm space-y-2">
+      <div class="font-medium text-slate-700">원점에서의 연속성 점검</div>
+      <div class="flex justify-between stat"><span class="text-slate-500">직선 경로 끝값 f(P+t·d)</span><span id="lineval" class="font-mono"></span></div>
+      <div class="flex justify-between stat"><span class="text-slate-500">휘어진 경로 끝값</span><span id="curveval" class="font-mono"></span></div>
+      <div id="verdict" class="text-xs leading-relaxed"></div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-xs text-slate-500 leading-relaxed">
+    매끈한 곡면 $f(x,y)=x^2+xy+2y^2$ 에서는 어느 방향이든 할선 기울기가 접선 기울기 $D_d f(P)=\langle\nabla f(P),d\rangle$ 로 모입니다.
+    반례 $f$ 에서는 모든 <b>직선</b> 방향에서 $D_d f(P)=0$ 이지만, 휘어짐 $c$ 를 올려 $y$축에 붙는 경로로 다가가면 끝값이 1로 튀어 원점에서 불연속임이 드러납니다.
+  </p>
+</div>
+
+<script>
+// ---------- function models ----------
+// smooth: f = x^2 + x y + 2 y^2,  grad at origin = (0,0); use P=(0.6,0.9) so it's nonzero & interesting
+const Psmooth = {x: 0.6, y: 0.9};
+function fSmoothVal(x, y) { return x*x + x*y + 2*y*y; }
+function gradSmooth(x, y) { return {x: 2*x + y, y: x + 4*y}; }
+// counterexample: f = 0 on the y-axis (x==0), else 1; P = origin
+function fCounterVal(x, y) { return Math.abs(x) < 1e-9 ? 0 : 1; }
+
+let mode = "smooth";          // "smooth" | "counter"
+let d = {x: 1, y: 0};         // direction (unit)
+let tlen = 0.8, curveAmt = 0;
+
+const P = () => (mode === "smooth" ? Psmooth : {x: 0, y: 0});
+const fval = (x, y) => (mode === "smooth" ? fSmoothVal(x, y) : fCounterVal(x, y));
+
+// path from P toward... : straight d, optionally bent toward the y-axis (x -> 0) as curve grows.
+// param s in [0,1]; point = P + s*t*d, then for counterexample bend x by (1-c) factor near origin.
+function pathPoint(s) {
+  const base = {x: P().x + s * tlen * d.x, y: P().y + s * tlen * d.y};
+  if (mode === "counter") {
+    // bend the x-coordinate toward 0 so the path hugs the y-axis (where f=0) but endpoint still off-axis when c<1
+    base.x = base.x * (1 - curveAmt) + curveAmt * Math.sign(base.x || 1) * (s * tlen) * (s * tlen);
+  }
+  return base;
+}
+
+// ---------- canvases ----------
+const plane = document.getElementById("plane"), pctx = plane.getContext("2d");
+const slice = document.getElementById("slice"), sctx = slice.getContext("2d");
+
+function fitCanvas(cv, ctx, ratio) {
+  const css = cv.clientWidth, h = Math.max(260, Math.round(css * ratio));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr; cv.style.height = h + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return {w: css, h};
+}
+
+// ---- plane (domain) ----
+const PR = 2.4;   // world half-range
+function pW2S(px, py, dim) { return {x: dim.w/2 + px/PR*(dim.w/2*0.9), y: dim.h/2 - py/PR*(dim.h/2*0.9)}; }
+function pS2W(sx, sy, dim) { return {x: (sx - dim.w/2)/(dim.w/2*0.9)*PR, y: -(sy - dim.h/2)/(dim.h/2*0.9)*PR}; }
+
+function drawPlane() {
+  const dim = fitCanvas(plane, pctx, 0.92);
+  pctx.clearRect(0, 0, dim.w, dim.h);
+  // grid
+  pctx.strokeStyle = "#eef2f7"; pctx.lineWidth = 1;
+  for (let i = -2; i <= 2; i++) {
+    let a = pW2S(i, -PR, dim), b = pW2S(i, PR, dim);
+    pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke();
+    a = pW2S(-PR, i, dim); b = pW2S(PR, i, dim);
+    pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke();
+  }
+  // axes
+  pctx.strokeStyle = "#cbd5e1"; pctx.lineWidth = 1.5;
+  let a = pW2S(-PR, 0, dim), b = pW2S(PR, 0, dim);
+  pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke();
+  a = pW2S(0, -PR, dim); b = pW2S(0, PR, dim);
+  pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke();
+  // counterexample: highlight the y-axis (f=0 line)
+  if (mode === "counter") {
+    pctx.strokeStyle = "#10b981"; pctx.lineWidth = 3;
+    a = pW2S(0, -PR, dim); b = pW2S(0, PR, dim);
+    pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke();
+    pctx.fillStyle = "#059669"; pctx.font = "11px ui-sans-serif";
+    pctx.fillText("y-axis: f=0", pW2S(0, PR, dim).x + 6, pW2S(0, PR, dim).y + 14);
+  }
+  // straight direction line through P
+  const Pp = P();
+  pctx.strokeStyle = "#93c5fd"; pctx.lineWidth = 1.5; pctx.setLineDash([5, 4]);
+  a = pW2S(Pp.x - PR*d.x, Pp.y - PR*d.y, dim); b = pW2S(Pp.x + PR*d.x, Pp.y + PR*d.y, dim);
+  pctx.beginPath(); pctx.moveTo(a.x, a.y); pctx.lineTo(b.x, b.y); pctx.stroke();
+  pctx.setLineDash([]);
+  // actual path (red = curved)
+  pctx.strokeStyle = (mode === "counter" && curveAmt > 0) ? "#e11d48" : "#2563eb";
+  pctx.lineWidth = 2.5;
+  pctx.beginPath();
+  for (let k = 0; k <= 60; k++) {
+    const pt = pathPoint(k / 60), s = pW2S(pt.x, pt.y, dim);
+    k ? pctx.lineTo(s.x, s.y) : pctx.moveTo(s.x, s.y);
+  }
+  pctx.stroke();
+  // endpoint
+  const end = pathPoint(1), es = pW2S(end.x, end.y, dim);
+  pctx.fillStyle = pctx.strokeStyle; pctx.beginPath(); pctx.arc(es.x, es.y, 5, 0, 7); pctx.fill();
+  // target point P
+  const ps = pW2S(Pp.x, Pp.y, dim);
+  pctx.fillStyle = "#111827"; pctx.beginPath(); pctx.arc(ps.x, ps.y, 5, 0, 7); pctx.fill();
+  pctx.font = "bold 13px ui-sans-serif"; pctx.fillText("P", ps.x + 7, ps.y - 7);
+  // direction handle (unit vector from P)
+  const hs = pW2S(Pp.x + d.x, Pp.y + d.y, dim);
+  pctx.strokeStyle = "#1d4ed8"; pctx.lineWidth = 3;
+  pctx.beginPath(); pctx.moveTo(ps.x, ps.y); pctx.lineTo(hs.x, hs.y); pctx.stroke();
+  pctx.fillStyle = "#1d4ed8"; pctx.beginPath(); pctx.arc(hs.x, hs.y, 7, 0, 7); pctx.fill();
+  pctx.fillStyle = "#fff"; pctx.font = "bold 11px ui-sans-serif"; pctx.fillText("d", hs.x - 3, hs.y + 4);
+}
+
+// ---- slice (cross-section curve along straight d) ----
+function drawSlice() {
+  const dim = fitCanvas(slice, sctx, 0.92);
+  sctx.clearRect(0, 0, dim.w, dim.h);
+  const Pp = P();
+  // sample g(t)=f(P+t d) for t in [-1.6,1.6]
+  const tmax = 1.6;
+  let lo = Infinity, hi = -Infinity;
+  const samp = [];
+  for (let k = 0; k <= 200; k++) {
+    const tt = -tmax + 2*tmax*k/200;
+    const val = fval(Pp.x + tt*d.x, Pp.y + tt*d.y);
+    samp.push([tt, val]); lo = Math.min(lo, val); hi = Math.max(hi, val);
+  }
+  if (hi - lo < 1e-6) { hi += 0.5; lo -= 0.5; }
+  const padY = (hi - lo) * 0.15; lo -= padY; hi += padY;
+  const X = tt => dim.w*0.12 + (tt + tmax)/(2*tmax) * dim.w*0.82;
+  const Y = vv => dim.h*0.9 - (vv - lo)/(hi - lo) * dim.h*0.82;
+  // axes
+  sctx.strokeStyle = "#cbd5e1"; sctx.lineWidth = 1.2;
+  sctx.beginPath(); sctx.moveTo(X(-tmax), Y(fval(Pp.x, Pp.y))); sctx.lineTo(X(tmax), Y(fval(Pp.x, Pp.y))); sctx.stroke();
+  sctx.beginPath(); sctx.moveTo(X(0), Y(lo)); sctx.lineTo(X(0), Y(hi)); sctx.stroke();
+  sctx.fillStyle = "#64748b"; sctx.font = "11px ui-sans-serif";
+  sctx.fillText("t", X(tmax) - 8, Y(fval(Pp.x, Pp.y)) - 6);
+  sctx.fillText("f(P+t·d)", X(0) + 6, Y(hi) + 12);
+  // curve
+  sctx.strokeStyle = "#0f766e"; sctx.lineWidth = 2.5;
+  sctx.beginPath();
+  let started = false;
+  for (const [tt, val] of samp) {
+    const sx = X(tt), sy = Y(val);
+    // counterexample is discontinuous at t where x-coord hits 0: break the stroke
+    if (!started) { sctx.moveTo(sx, sy); started = true; }
+    else sctx.lineTo(sx, sy);
+  }
+  sctx.stroke();
+  // point at t=0 (value f(P))
+  const f0 = fval(Pp.x, Pp.y);
+  sctx.fillStyle = "#111827"; sctx.beginPath(); sctx.arc(X(0), Y(f0), 5, 0, 7); sctx.fill();
+  // secant point at t = tlen
+  const ft = fval(Pp.x + tlen*d.x, Pp.y + tlen*d.y);
+  const secSlope = (ft - f0) / tlen;
+  sctx.fillStyle = "#2563eb"; sctx.beginPath(); sctx.arc(X(tlen), Y(ft), 5, 0, 7); sctx.fill();
+  // secant line
+  sctx.strokeStyle = "#94a3b8"; sctx.lineWidth = 1.4; sctx.setLineDash([5,4]);
+  sctx.beginPath(); sctx.moveTo(X(-tmax), Y(f0 + secSlope*(-tmax))); sctx.lineTo(X(tmax), Y(f0 + secSlope*tmax)); sctx.stroke();
+  sctx.setLineDash([]);
+  // tangent line (directional derivative slope) — only meaningful for smooth
+  let dd;
+  if (mode === "smooth") {
+    const g = gradSmooth(Pp.x, Pp.y); dd = g.x*d.x + g.y*d.y;
+  } else { dd = 0; }
+  sctx.strokeStyle = "#dc2626"; sctx.lineWidth = 2;
+  sctx.beginPath(); sctx.moveTo(X(-tmax), Y(f0 + dd*(-tmax))); sctx.lineTo(X(tmax), Y(f0 + dd*tmax)); sctx.stroke();
+  sctx.fillStyle = "#dc2626"; sctx.font = "11px ui-sans-serif";
+  sctx.fillText("tangent: slope = D_d f(P) = " + dd.toFixed(2), X(-tmax)+4, Y(hi)+12);
+
+  // readouts
+  const theta = Math.atan2(d.y, d.x) * 180/Math.PI;
+  document.getElementById("dvec").textContent = `(${d.x.toFixed(3)}, ${d.y.toFixed(3)})`;
+  document.getElementById("theta").textContent = theta.toFixed(1) + "°";
+  document.getElementById("sec").textContent = secSlope.toFixed(3);
+  document.getElementById("dd").textContent = dd.toFixed(3);
+  const g = mode === "smooth" ? gradSmooth(Pp.x, Pp.y) : {x:0,y:0};
+  document.getElementById("gd").textContent = (g.x*d.x + g.y*d.y).toFixed(3);
+
+  // continuity panel
+  const end = pathPoint(1);
+  const lineEnd = fval(Pp.x + tlen*d.x, Pp.y + tlen*d.y);
+  const curveEnd = fval(end.x, end.y);
+  document.getElementById("lineval").textContent = lineEnd.toFixed(3);
+  document.getElementById("curveval").textContent = curveEnd.toFixed(3);
+  const verdict = document.getElementById("verdict");
+  if (mode === "smooth") {
+    verdict.innerHTML = '<span class="text-emerald-600 font-medium">매끈함:</span> 모든 방향에서 할선 기울기 → 접선 기울기 = ⟨∇f, d⟩. 경로를 휘어도 끝값이 연속적으로 모입니다 (미분가능).';
+  } else {
+    const jump = Math.abs(curveEnd - f0) > 0.5;
+    verdict.innerHTML = '<span class="text-rose-600 font-medium">반례:</span> 모든 직선 방향미분 = 0 인데, ' +
+      (jump ? '휘어진 경로 끝값이 <b>1</b> 로 튐 → 원점에서 <b>불연속</b> (미분 불가).'
+            : '휘어짐 c 를 올려 보세요 — y축에 붙는 경로가 불연속을 드러냅니다.');
+  }
+}
+
+function draw() { drawPlane(); drawSlice(); }
+
+// ---------- interaction ----------
+function setDirFromEvent(e) {
+  const dim = {w: plane.clientWidth, h: plane.clientHeight};
+  const r = plane.getBoundingClientRect();
+  const w = pS2W(e.clientX - r.left, e.clientY - r.top, dim);
+  const Pp = P();
+  let dx = w.x - Pp.x, dy = w.y - Pp.y;
+  const n = Math.hypot(dx, dy);
+  if (n > 1e-6) { d = {x: dx/n, y: dy/n}; }
+  draw();
+}
+let dragging = false;
+plane.addEventListener("pointerdown", e => { dragging = true; plane.setPointerCapture(e.pointerId); plane.style.cursor = "grabbing"; setDirFromEvent(e); });
+plane.addEventListener("pointermove", e => { if (dragging) setDirFromEvent(e); });
+plane.addEventListener("pointerup", () => { dragging = false; plane.style.cursor = "grab"; });
+
+function bind(id, vid, set, fmt) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(parseFloat(el.value)); draw(); };
+  el.addEventListener("input", upd); upd();
+}
+bind("tlen", "tv", v => tlen = v, v => v.toFixed(2));
+bind("curve", "cv", v => curveAmt = v, v => v.toFixed(2));
+
+function setMode(m) {
+  mode = m;
+  const sm = document.getElementById("fSmooth"), ce = document.getElementById("fCounter");
+  const on = "px-3 py-1.5 bg-blue-600 text-white", off = "px-3 py-1.5 bg-white hover:bg-slate-100";
+  sm.className = m === "smooth" ? on : off;
+  ce.className = m === "counter" ? on : off;
+  document.getElementById("curveWrap").style.opacity = m === "counter" ? "1" : "0.35";
+  draw();
+}
+document.getElementById("fSmooth").onclick = () => setMode("smooth");
+document.getElementById("fCounter").onclick = () => setMode("counter");
+
+window.addEventListener("resize", draw);
+window.addEventListener("load", () => {
+  if (window.katex) {
+    katex.render(String.raw`D_d f(P)=\lim_{h\to 0}\tfrac{f(P+hd)-f(P)}{h}`, document.getElementById("cedef"), {throwOnError:false});
+  }
+  setMode("smooth");
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>02. 낭떠러지(크레바스) 함수 — 직선으로는 안 떨어진다-09강 3기 05강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">미분의 정의에 대한 디스커션 (뉴진수 5강)-09강 3기 05강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">02. 낭떠러지(크레바스) 함수 — 직선으로는 안 떨어진다</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    함수 <span id="fdef"></span> — 포물선 모양의 좁은 틈
+    <span class="font-mono text-rose-600">0&lt;y&lt;x²</span> 에서만 값이 <b>1</b>, 그 밖은 <b>0</b> 인 불연속 함수입니다.
+    원점에서 <b class="text-blue-700">방향 D</b> 를 고정하고 직선 <span class="font-mono">hD</span> 로 다가가면(슬라이더로 <span class="font-mono">θ, h</span> 조절),
+    <span class="font-mono">h</span> 가 작아지는 순간 직선이 틈을 비껴 <b>바닥(f=0)</b>으로 들어와 <b>방향도함수가 0</b> 입니다.
+    그런데 틈을 따라 휘는 <b class="text-emerald-600">곡선 y=½c·x²</b>(곡률 슬라이더) 위에서는 <b>f≡1</b> — 원점에서 불연속.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">θ — 고정 방향 D <span id="thv" class="float-right font-mono text-slate-500"></span>
+          <input id="th" type="range" min="0" max="360" step="1" value="20" class="w-full accent-blue-600" /></label>
+        <label class="block text-sm">h — 직선 위 점 P+hD <span id="hv" class="float-right font-mono text-slate-500"></span>
+          <input id="h" type="range" min="0.02" max="1.4" step="0.02" value="0.9" class="w-full accent-blue-600" /></label>
+        <label class="block text-sm">c — 곡선 곡률 (y=½c·x²) <span id="cv2" class="float-right font-mono text-slate-500"></span>
+          <input id="cc" type="range" min="0.2" max="3" step="0.1" value="1" class="w-full accent-emerald-600" /></label>
+        <button id="shrink" class="w-full text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">h → 0 으로 줄이기 (애니메이션)</button>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">P+hD</span><span id="pt" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f(P+hD) — 직선</span><span id="fline" class="font-mono font-bold"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">방향도함수 (직선)</span><span id="ddir" class="font-mono"></span></div>
+        <div class="border-t pt-1 flex justify-between"><span class="text-slate-500">곡선 점 (x, ½c·x²)</span><span id="cpt" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f(곡선 점)</span><span id="fcurve" class="font-mono font-bold text-emerald-700"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        직선 <span class="font-mono">hD</span> 는 <span class="font-mono">h</span> 를 줄이면 결국 틈 <span class="font-mono">0&lt;y&lt;x²</span> 을 벗어나 <span class="font-mono">f=0</span> → 방향도함수 0.
+        곡선은 틈을 따라가 <span class="font-mono">f=1</span> 유지 → 원점에서 불연속, 미분 불가능.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let TH = 20 * Math.PI / 180;     // direction angle
+let H = 0.9;                     // distance along the line
+let C = 1.0;                     // curve curvature: y = 0.5*C*x^2
+let S = 70;                      // px per world unit
+let anim = null;
+
+// world view: x in [-1.6, 1.6], y in [-0.6, 1.6]
+const VX = 1.6, VYlo = -0.6, VYhi = 1.6;
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(320, Math.round(css * 0.72));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css / (2 * VX), h / (VYhi - VYlo));
+  draw();
+}
+function cw() { return cv.clientWidth; }
+function ch() { return cv.height / (window.devicePixelRatio || 1); }
+// origin placed so that world (0,0) sits in view; center x, and y so VYlo..VYhi fits
+function ox() { return cw() / 2; }
+function oy() { return ch() - (0 - VYlo) * S; }   // pixel y of world y=0
+function W2S(p) { return { x: ox() + p.x * S, y: oy() - p.y * S }; }
+
+// the crevasse: f = 1 on 0 < y < x^2, else 0
+const inGap = (x, y) => (y > 0 && y < x * x);
+
+function drawGap() {
+  // shade the region 0 < y < x^2 (rose)
+  ctx.fillStyle = 'rgba(244,63,94,0.18)';
+  ctx.beginPath();
+  // upper boundary y = x^2 from x=-VX..VX, lower boundary y=0
+  const N = 200;
+  let started = false;
+  for (let i = 0; i <= N; i++) {
+    const x = -VX + (2 * VX) * i / N;
+    const p = W2S({ x, y: Math.min(x * x, VYhi) });
+    started ? ctx.lineTo(p.x, p.y) : (ctx.moveTo(p.x, p.y), started = true);
+  }
+  const r = W2S({ x: VX, y: 0 }), l = W2S({ x: -VX, y: 0 });
+  ctx.lineTo(r.x, r.y); ctx.lineTo(l.x, l.y);
+  ctx.closePath(); ctx.fill();
+  // boundary parabola y = x^2
+  ctx.strokeStyle = '#fb7185'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const x = -VX + (2 * VX) * i / N;
+    const p = W2S({ x, y: x * x });
+    i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+  }
+  ctx.stroke();
+}
+
+function axes() {
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.2;
+  let a = W2S({ x: -VX, y: 0 }), b = W2S({ x: VX, y: 0 });
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  a = W2S({ x: 0, y: VYlo }); b = W2S({ x: 0, y: VYhi });
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+}
+
+function arrowTo(p, color) {
+  const o = W2S({ x: 0, y: 0 }), t = W2S(p);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+  const ang = Math.atan2(t.y - o.y, t.x - o.x), hh = 10;
+  ctx.beginPath(); ctx.moveTo(t.x, t.y);
+  ctx.lineTo(t.x - hh * Math.cos(ang - 0.4), t.y - hh * Math.sin(ang - 0.4));
+  ctx.lineTo(t.x - hh * Math.cos(ang + 0.4), t.y - hh * Math.sin(ang + 0.4));
+  ctx.closePath(); ctx.fill();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, cw(), ch());
+  drawGap();
+  axes();
+
+  // fixed-direction line through origin (full chord, dashed)
+  const dx = Math.cos(TH), dy = Math.sin(TH);
+  ctx.strokeStyle = '#93c5fd'; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+  let pa = W2S({ x: -2 * dx, y: -2 * dy }), pb = W2S({ x: 2 * dx, y: 2 * dy });
+  ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // the curve y = 0.5*C*x^2 (emerald) — dives along the gap
+  ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const x = -VX + (2 * VX) * i / 200;
+    const p = W2S({ x, y: 0.5 * C * x * x });
+    i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+  }
+  ctx.stroke();
+
+  // direction arrow (unit) for reference
+  arrowTo({ x: dx, y: dy }, '#2563eb');
+
+  // point P + hD on the line
+  const px = H * dx, py = H * dy;
+  const sp = W2S({ x: px, y: py });
+  const onGap = inGap(px, py);
+  ctx.fillStyle = onGap ? '#e11d48' : '#1d4ed8';
+  ctx.beginPath(); ctx.arc(sp.x, sp.y, 6, 0, 2 * Math.PI); ctx.fill();
+
+  // a matching point on the curve at same x (to show it stays in the gap)
+  const cy = 0.5 * C * px * px;
+  const cp = W2S({ x: px, y: cy });
+  const onGapCurve = inGap(px, cy);
+  ctx.fillStyle = onGapCurve ? '#059669' : '#94a3b8';
+  ctx.beginPath(); ctx.arc(cp.x, cp.y, 5.5, 0, 2 * Math.PI); ctx.fill();
+
+  // origin
+  const o = W2S({ x: 0, y: 0 });
+  ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(o.x, o.y, 4, 0, 2 * Math.PI); ctx.fill();
+
+  // labels
+  ctx.font = '12px ui-sans-serif'; ctx.fillStyle = '#1d4ed8';
+  ctx.fillText('hD', sp.x + 8, sp.y - 6);
+  ctx.fillStyle = '#059669';
+  ctx.fillText('곡선', cp.x + 8, cp.y + 14);
+  ctx.fillStyle = '#be123c'; ctx.font = '11px ui-sans-serif';
+  ctx.fillText('틈: 0<y<x²  (f=1)', W2S({ x: 0.45, y: 0.12 }).x, W2S({ x: 0.45, y: 0.12 }).y);
+
+  // readouts
+  const fLine = onGap ? 1 : 0;
+  document.getElementById('pt').textContent = `(${px.toFixed(3)}, ${py.toFixed(3)})`;
+  document.getElementById('fline').textContent = fLine.toFixed(0);
+  document.getElementById('fline').className = 'font-mono font-bold ' + (fLine ? 'text-rose-600' : 'text-blue-700');
+  document.getElementById('ddir').textContent = '0';   // along any fixed line, f≡0 for small h
+  document.getElementById('cpt').textContent = `(${px.toFixed(3)}, ${cy.toFixed(3)})`;
+  const fCurve = onGapCurve ? 1 : 0;
+  document.getElementById('fcurve').textContent = fCurve.toFixed(0);
+}
+
+function bind(id, vid, fmt, set) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(parseFloat(el.value)); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bind('th', 'thv', v => v.toFixed(0) + '°', v => TH = v * Math.PI / 180);
+bind('h', 'hv', v => v.toFixed(2), v => H = v);
+bind('cc', 'cv2', v => v.toFixed(1), v => C = v);
+
+document.getElementById('shrink').onclick = () => {
+  if (anim) { cancelAnimationFrame(anim); anim = null; }
+  const el = document.getElementById('h');
+  let val = parseFloat(el.value);
+  const step = () => {
+    val *= 0.92;
+    if (val < 0.02) val = 0.02;
+    el.value = val; H = val;
+    document.getElementById('hv').textContent = val.toFixed(2);
+    draw();
+    if (val > 0.021) anim = requestAnimationFrame(step);
+  };
+  step();
+};
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`f(x,y)=\begin{cases}1&0<y<x^2\\0&\text{else}\end{cases}`, document.getElementById('fdef'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

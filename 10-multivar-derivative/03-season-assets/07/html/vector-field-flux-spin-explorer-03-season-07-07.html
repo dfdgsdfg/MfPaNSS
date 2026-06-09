@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>7. 발산: 소스와 싱크를 재는 양-10강 3기 07강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">편미분계수, 미분과 선형대수의 관계, Gradient, Curl, Divergence (뉴진수 7강)-10강 3기 07강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">7. 발산: 소스와 싱크를 재는 양</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    벡터장 <span id="Fdef"></span> 를 슬라이더로 섞고, 작은 <b class="text-emerald-600">원판</b>을 끌어 보세요.
+    원판 경계를 <span class="font-medium">바깥으로 빠져나가는 양</span>(플럭스)이 <span id="divdef"></span> 의 부호를,
+    <span class="font-medium">둘레를 도는 양</span>(순환)이 <span id="curldef"></span> 의 부호를 말해 줍니다.
+    같은 화살표 그림이라도 <b>퍼짐</b>과 <b>돎</b>은 서로 다른 질문입니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_250px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">a · 소스/싱크 <span id="av" class="float-right font-mono text-slate-500"></span>
+          <input id="a" type="range" min="-2" max="2" step="0.1" value="1" class="w-full accent-emerald-600" /></label>
+        <label class="block text-sm">b · 회전 <span id="bv" class="float-right font-mono text-slate-500"></span>
+          <input id="b" type="range" min="-2" max="2" step="0.1" value="0" class="w-full accent-rose-600" /></label>
+        <label class="block text-sm">r · 원판 반지름 <span id="rv" class="float-right font-mono text-slate-500"></span>
+          <input id="r" type="range" min="0.3" max="1.6" step="0.05" value="0.8" class="w-full accent-slate-600" /></label>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button id="src"  class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">소스 (x,y)</button>
+          <button id="rot"  class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">회전 (-y,x)</button>
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">리셋</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">div F (퍼짐)</span><span id="div" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">curl F (돎)</span><span id="curl" class="font-mono"></span></div>
+        <div class="border-t border-slate-100 my-1"></div>
+        <div class="flex justify-between"><span class="text-slate-500">원판 플럭스 ∮F·n</span><span id="flux" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">원판 순환 ∮F·t</span><span id="circ" class="font-mono"></span></div>
+        <div class="flex justify-between text-xs text-slate-400"><span>= div·πr²</span><span id="dcheck" class="font-mono"></span></div>
+        <div class="flex justify-between text-xs text-slate-400"><span>= curl·πr²</span><span id="ccheck" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        F = (a·x − b·y, &nbsp;a·y + b·x).&nbsp; div F = 2a,&nbsp; curl F = 2b — 위치와 무관한 상수입니다.
+        그린 정리로 경계 적분은 넓이 πr² 배가 됩니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let A = 1, B = 0, R = 0.8;
+let c = {x: 0.0, y: 0.0};            // disk center (world coords)
+let S = 70, drag = false;
+
+// vector field F(x,y) = (a x - b y, a y + b x)  ->  div = 2a, curl = 2b
+const field = (x, y) => ({ x: A * x - B * y, y: A * y + B * x });
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(320, Math.round(css * 0.82));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css, h) / 6.4;        // fit roughly +/-3 units
+  draw();
+}
+const W2S = p => ({ x: cv.clientWidth / 2 + p.x * S, y: cv.clientHeight / 2 - p.y * S });
+const S2W = (sx, sy) => ({ x: (sx - cv.clientWidth / 2) / S, y: -(sy - cv.clientHeight / 2) / S });
+
+function arrow(px, py, vx, vy, color, scale) {
+  const o = W2S({ x: px, y: py });
+  const t = W2S({ x: px + vx * scale, y: py + vy * scale });
+  const a = Math.atan2(t.y - o.y, t.x - o.x), len = Math.hypot(t.x - o.x, t.y - o.y);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+  if (len > 3) {
+    const hh = Math.min(8, len * 0.4);
+    ctx.beginPath(); ctx.moveTo(t.x, t.y);
+    ctx.lineTo(t.x - hh * Math.cos(a - 0.4), t.y - hh * Math.sin(a - 0.4));
+    ctx.lineTo(t.x - hh * Math.cos(a + 0.4), t.y - hh * Math.sin(a + 0.4));
+    ctx.closePath(); ctx.fill();
+  }
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cv.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -4; i <= 4; i++) {
+    let p = W2S({ x: i, y: -4 }), q = W2S({ x: i, y: 4 });
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+    p = W2S({ x: -4, y: i }); q = W2S({ x: 4, y: i });
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let p = W2S({ x: -4, y: 0 }), q = W2S({ x: 4, y: 0 });
+  ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  p = W2S({ x: 0, y: -4 }); q = W2S({ x: 0, y: 4 });
+  ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+
+  // field arrows on a grid, scaled so the longest fits a cell
+  let maxm = 1e-6;
+  for (let gx = -2.5; gx <= 2.5; gx += 0.5)
+    for (let gy = -2.5; gy <= 2.5; gy += 0.5) {
+      const f = field(gx, gy); maxm = Math.max(maxm, Math.hypot(f.x, f.y));
+    }
+  const scale = 0.42 / maxm;
+  for (let gx = -2.5; gx <= 2.5; gx += 0.5)
+    for (let gy = -2.5; gy <= 2.5; gy += 0.5) {
+      const f = field(gx, gy);
+      arrow(gx, gy, f.x, f.y, '#94a3b8', scale);
+    }
+
+  // the probe disk
+  const cc = W2S(c);
+  ctx.fillStyle = 'rgba(16,185,129,0.10)';
+  ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.setLineDash([6, 4]);
+  ctx.beginPath(); ctx.arc(cc.x, cc.y, R * S, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // field arrows on the disk boundary, colored by outward (flux) sign
+  const NB = 16;
+  for (let k = 0; k < NB; k++) {
+    const t = k / NB * 2 * Math.PI;
+    const bx = c.x + R * Math.cos(t), by = c.y + R * Math.sin(t);
+    const f = field(bx, by);
+    const nx = Math.cos(t), ny = Math.sin(t);          // outward normal
+    const outward = f.x * nx + f.y * ny;
+    arrow(bx, by, f.x, f.y, outward >= 0 ? '#2563eb' : '#e11d48', scale);
+  }
+  ctx.fillStyle = '#059669'; ctx.font = '12px ui-sans-serif';
+  ctx.fillText('원판 (드래그)', cc.x - 30, cc.y - R * S - 8);
+
+  // numeric flux & circulation around the disk boundary
+  const N = 720, dth = 2 * Math.PI / N;
+  let flux = 0, circ = 0;
+  for (let k = 0; k < N; k++) {
+    const t = k * dth;
+    const bx = c.x + R * Math.cos(t), by = c.y + R * Math.sin(t);
+    const f = field(bx, by);
+    const nx = Math.cos(t), ny = Math.sin(t);          // outward normal
+    const tx = -Math.sin(t), ty = Math.cos(t);         // ccw tangent
+    flux += (f.x * nx + f.y * ny) * R * dth;           // ∮ F·n ds
+    circ += (f.x * tx + f.y * ty) * R * dth;           // ∮ F·t ds
+  }
+  const divF = 2 * A, curlF = 2 * B, area = Math.PI * R * R;
+  document.getElementById('div').textContent  = divF.toFixed(2);
+  document.getElementById('curl').textContent = curlF.toFixed(2);
+  document.getElementById('flux').textContent = flux.toFixed(3);
+  document.getElementById('circ').textContent = circ.toFixed(3);
+  document.getElementById('dcheck').textContent = (divF * area).toFixed(3);
+  document.getElementById('ccheck').textContent = (curlF * area).toFixed(3);
+}
+
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  if ((m.x - c.x) ** 2 + (m.y - c.y) ** 2 < (R + 0.3) ** 2) { drag = true; cv.setPointerCapture(e.pointerId); }
+});
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  c.x = Math.max(-3, Math.min(3, m.x)); c.y = Math.max(-3, Math.min(3, m.y));
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = false);
+
+function bindSlider(id, vid, set) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = (+el.value).toFixed(2); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('a', 'av', v => A = v);
+bindSlider('b', 'bv', v => B = v);
+bindSlider('r', 'rv', v => R = v);
+
+function setAB(a, b) {
+  document.getElementById('a').value = a; document.getElementById('b').value = b;
+  A = a; B = b;
+  document.getElementById('av').textContent = a.toFixed(2);
+  document.getElementById('bv').textContent = b.toFixed(2);
+  draw();
+}
+document.getElementById('src').onclick = () => setAB(1, 0);   // F=(x,y), pure source
+document.getElementById('rot').onclick = () => setAB(0, 1);   // F=(-y,x), pure rotation
+document.getElementById('reset').onclick = () => { c = { x: 0, y: 0 }; setAB(1, 0); document.getElementById('r').value = 0.8; R = 0.8; document.getElementById('rv').textContent = '0.80'; draw(); };
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`F:\mathbb{R}^2\to\mathbb{R}^2`, document.getElementById('Fdef'));
+    katex.render(String.raw`\operatorname{div}F=\partial_x F_1+\partial_y F_2`, document.getElementById('divdef'));
+    katex.render(String.raw`\operatorname{curl}F=\partial_x F_2-\partial_y F_1`, document.getElementById('curldef'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

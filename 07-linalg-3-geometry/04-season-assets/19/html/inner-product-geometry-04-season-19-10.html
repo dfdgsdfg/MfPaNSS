@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>10. 내적에서 크기와 각도가 따라 나온다-07강 4기 19강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">내적을 토대로 벡터들 관계 규정짓기-07강 4기 19강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">10. 내적에서 크기와 각도가 따라 나온다</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    내적 <span id="ipdef"></span> 을 대각 행렬 <span id="Mdef"></span> 로 주면, 그 내적이 "단위가 되는 벡터들"의 모임
+    <span class="font-medium">(단위원 <span id="balldef"></span>)</span> 이 곧 그 공간의 <b>기하</b>입니다.
+    슬라이더로 <span class="font-mono">λ₁, λ₂</span> 를 바꾸고 두 벡터 <b class="text-blue-600">u</b>·<b class="text-rose-600">v</b> 를 끌어 보세요.
+    <span class="font-mono">λ₁=λ₂=1</span> 이면 유클리드(원), 다르면 타원 — 같은 좌표라도 크기·각도가 달라집니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">λ₁ (x축 가중치) <span id="l1v" class="float-right font-mono text-slate-500"></span>
+          <input id="l1" type="range" min="0.2" max="4" step="0.1" value="1" class="w-full accent-blue-600" /></label>
+        <label class="block text-sm">λ₂ (y축 가중치) <span id="l2v" class="float-right font-mono text-slate-500"></span>
+          <input id="l2" type="range" min="0.2" max="4" step="0.1" value="1" class="w-full accent-blue-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="std" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">표준내적 (1,1)</button>
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">벡터 리셋</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">⟨u,v⟩</span><span id="ip" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">‖u‖</span><span id="nu" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">‖v‖</span><span id="nv" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">cos θ</span><span id="cos" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">θ</span><span id="ang" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        ⟨u,v⟩ = λ₁·uₓvₓ + λ₂·u<sub>y</sub>v<sub>y</sub>,&nbsp; ‖v‖ = √⟨v,v⟩,&nbsp; cos θ = ⟨u,v⟩ / (‖u‖‖v‖).
+        직교(⟨u,v⟩=0)면 그 내적 기준으로 수직입니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let L1 = 1, L2 = 1;
+let u = {x: 2.0, y: 0.6}, v = {x: 0.7, y: 1.9};           // world coords
+const U0 = {...u}, V0 = {...v};
+let S = 70;                                               // px per unit (recomputed on resize)
+let drag = null;
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(320, Math.round(css * 0.78));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css, h) / 6.4;                             // fit roughly ±3 units
+  draw();
+}
+function W2S(p) { return { x: cv.clientWidth / 2 + p.x * S, y: cv.height / (window.devicePixelRatio||1) / 2 - p.y * S }; }
+function S2W(sx, sy) { return { x: (sx - cv.clientWidth / 2) / S, y: -(sy - cv.clientHeight / 2) / S }; }
+
+const ip = (a, b) => L1 * a.x * b.x + L2 * a.y * b.y;
+const norm = a => Math.sqrt(Math.max(ip(a, a), 1e-12));
+
+function arrow(p, color, label) {
+  const o = W2S({x:0,y:0}), t = W2S(p);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+  const a = Math.atan2(t.y - o.y, t.x - o.x), h = 11;
+  ctx.beginPath(); ctx.moveTo(t.x, t.y);
+  ctx.lineTo(t.x - h*Math.cos(a-0.4), t.y - h*Math.sin(a-0.4));
+  ctx.lineTo(t.x - h*Math.cos(a+0.4), t.y - h*Math.sin(a+0.4));
+  ctx.closePath(); ctx.fill();
+  ctx.font = 'bold 15px ui-sans-serif'; ctx.fillText(label, t.x + 8, t.y - 6);
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cv.height / (window.devicePixelRatio||1);
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -4; i <= 4; i++) {
+    let a = W2S({x:i,y:-4}), b = W2S({x:i,y:4});
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    a = W2S({x:-4,y:i}); b = W2S({x:4,y:i});
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let a = W2S({x:-4,y:0}), b = W2S({x:4,y:0});
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  a = W2S({x:0,y:-4}); b = W2S({x:0,y:4});
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  // unit ball of the inner product: λ1 x² + λ2 y² = 1  → ellipse semi-axes 1/√λ
+  ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+  ctx.beginPath();
+  for (let k = 0; k <= 100; k++) {
+    const t = k/100*2*Math.PI;
+    const p = W2S({x: Math.cos(t)/Math.sqrt(L1), y: Math.sin(t)/Math.sqrt(L2)});
+    k ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y);
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = '#059669'; ctx.font = '12px ui-sans-serif';
+  ctx.fillText('단위원  ⟨x,x⟩=1', W2S({x:0, y:1/Math.sqrt(L2)}).x + 6, W2S({x:0, y:1/Math.sqrt(L2)}).y - 6);
+  // vectors
+  arrow(u, '#2563eb', 'u'); arrow(v, '#e11d48', 'v');
+  // readouts
+  const nu = norm(u), nv = norm(v), c = Math.max(-1, Math.min(1, ip(u,v)/(nu*nv)));
+  document.getElementById('ip').textContent  = ip(u,v).toFixed(2);
+  document.getElementById('nu').textContent  = nu.toFixed(2);
+  document.getElementById('nv').textContent  = nv.toFixed(2);
+  document.getElementById('cos').textContent = c.toFixed(3);
+  document.getElementById('ang').textContent = (Math.acos(c)*180/Math.PI).toFixed(1) + '°';
+}
+
+function pick(e) {
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  const near = p => (p.x-m.x)**2 + (p.y-m.y)**2 < 0.18;
+  drag = near(u) ? u : near(v) ? v : null;
+}
+cv.addEventListener('pointerdown', e => { pick(e); if (drag) cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  drag.x = Math.max(-3.5, Math.min(3.5, m.x)); drag.y = Math.max(-3.5, Math.min(3.5, m.y));
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = null);
+
+function bindSlider(id, vid, set) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = (+el.value).toFixed(1); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('l1','l1v', x => L1 = x);
+bindSlider('l2','l2v', x => L2 = x);
+document.getElementById('std').onclick = () => {
+  document.getElementById('l1').value = 1; document.getElementById('l2').value = 1;
+  L1 = L2 = 1; document.getElementById('l1v').textContent = '1.0'; document.getElementById('l2v').textContent = '1.0'; draw();
+};
+document.getElementById('reset').onclick = () => { u = {...U0}; v = {...V0}; draw(); };
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`\langle\cdot,\cdot\rangle:\mathbb{R}^2\times\mathbb{R}^2\to\mathbb{R}`, document.getElementById('ipdef'));
+    katex.render(String.raw`M=\begin{pmatrix}\lambda_1&0\\0&\lambda_2\end{pmatrix}`, document.getElementById('Mdef'));
+    katex.render(String.raw`\{x:\langle x,x\rangle_M=1\}`, document.getElementById('balldef'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

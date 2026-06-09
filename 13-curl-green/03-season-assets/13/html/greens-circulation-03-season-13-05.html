@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>05. 내부 회전과 경계 선적분-13강 3기 13강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">그린 정리, FTC의 일반화, 오일러 정리 (뉴진수 13강)-13강 3기 13강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">5. 내부 회전과 경계 선적분</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    그린 정리 <span id="gt"></span> 는 <b class="text-rose-600">경계 순환</b>(좌변)과 <b class="text-emerald-600">내부 회전의 면적분</b>(우변)이 같다고 말합니다.
+    슬라이더로 벡터장 <span id="Fdef"></span> 의 계수 <span class="font-mono">a, b, c, d</span> 를 바꾸면 회전밀도
+    <span id="curldef"></span> 가 변합니다. 직사각형 영역 <b class="text-blue-600">R</b> 의 모서리를 끌어 크기를 바꿔 보세요.
+    어떤 벡터장·어떤 영역에서도 <b>좌변 = 우변</b> 이 유지됩니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_250px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-2">
+        <div class="text-xs text-slate-500 mb-1">M = a·x + b·y</div>
+        <label class="block text-sm">a <span id="av" class="float-right font-mono text-slate-500"></span>
+          <input id="a" type="range" min="-2" max="2" step="0.1" value="0" class="w-full accent-blue-600" /></label>
+        <label class="block text-sm">b <span id="bv" class="float-right font-mono text-slate-500"></span>
+          <input id="b" type="range" min="-2" max="2" step="0.1" value="-1" class="w-full accent-blue-600" /></label>
+        <div class="text-xs text-slate-500 mb-1 pt-1">N = c·x + d·y</div>
+        <label class="block text-sm">c <span id="cv2" class="float-right font-mono text-slate-500"></span>
+          <input id="c" type="range" min="-2" max="2" step="0.1" value="1" class="w-full accent-blue-600" /></label>
+        <label class="block text-sm">d <span id="dv" class="float-right font-mono text-slate-500"></span>
+          <input id="d" type="range" min="-2" max="2" step="0.1" value="0" class="w-full accent-blue-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="rot" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">회전장 (−y, x)</button>
+          <button id="grad" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">보존장 (x, y)</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">회전밀도 N<sub>x</sub>−M<sub>y</sub></span><span id="curl" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">영역 넓이 |R|</span><span id="area" class="font-mono"></span></div>
+        <hr class="border-slate-100" />
+        <div class="flex justify-between"><span class="text-rose-600">좌변 ∮<sub>C</sub> M dx+N dy</span><span id="lhs" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-emerald-600">우변 ∬<sub>R</sub>(N<sub>x</sub>−M<sub>y</sub>)</span><span id="rhs" class="font-mono"></span></div>
+        <div class="flex justify-between font-semibold"><span class="text-slate-500">차이</span><span id="diff" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        선형장에서는 회전밀도가 상수 <span class="font-mono">(c−b)</span> 이므로 우변 = (c−b)·|R|.
+        좌변 순환은 경계를 반시계로 한 바퀴 돌며 수치적분한 값입니다. 두 값은 항상 일치합니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let a = 0, b = -1, c = 1, d = 0;          // F = (a x + b y, c x + d y)
+let R = { x0: -1.4, y0: -1.0, x1: 1.4, y1: 1.0 };   // rectangle in world coords
+let S = 70, drag = null;
+
+const M = (px, py) => a * px + b * py;
+const N = (px, py) => c * px + d * py;
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(320, Math.round(css * 0.82));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css, h) / 6.4;
+  draw();
+}
+function W2S(p) { return { x: cv.clientWidth / 2 + p.x * S, y: cv.clientHeight / 2 - p.y * S }; }
+function S2W(sx, sy) { return { x: (sx - cv.clientWidth / 2) / S, y: -(sy - cv.clientHeight / 2) / S }; }
+
+// numeric line integral of M dx + N dy around the rectangle, counterclockwise
+function circulation() {
+  const corners = [
+    { x: R.x0, y: R.y0 }, { x: R.x1, y: R.y0 },
+    { x: R.x1, y: R.y1 }, { x: R.x0, y: R.y1 }
+  ];
+  let sum = 0, steps = 400;
+  for (let e = 0; e < 4; e++) {
+    const p = corners[e], q = corners[(e + 1) % 4];
+    const dx = (q.x - p.x) / steps, dy = (q.y - p.y) / steps;
+    for (let i = 0; i < steps; i++) {
+      const mx = p.x + dx * (i + 0.5), my = p.y + dy * (i + 0.5);   // midpoint
+      sum += M(mx, my) * dx + N(mx, my) * dy;
+    }
+  }
+  return sum;
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cv.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -3; i <= 3; i++) {
+    let p = W2S({ x: i, y: -3 }), q = W2S({ x: i, y: 3 });
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+    p = W2S({ x: -3, y: i }); q = W2S({ x: 3, y: i });
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let p = W2S({ x: -3, y: 0 }), q = W2S({ x: 3, y: 0 });
+  ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+  p = W2S({ x: 0, y: -3 }); q = W2S({ x: 0, y: 3 });
+  ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+
+  // vector field samples
+  const curl = c - b;
+  for (let gx = -2.5; gx <= 2.5; gx += 0.5) {
+    for (let gy = -2.5; gy <= 2.5; gy += 0.5) {
+      const o = W2S({ x: gx, y: gy });
+      let vx = M(gx, gy), vy = N(gx, gy);
+      const mag = Math.hypot(vx, vy) || 1;
+      const len = 14 * Math.min(1, mag / 2.5);
+      vx = vx / mag * len; vy = -vy / mag * len;   // screen y flips
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(o.x + vx, o.y + vy); ctx.stroke();
+      const ang = Math.atan2(vy, vx);
+      ctx.beginPath(); ctx.moveTo(o.x + vx, o.y + vy);
+      ctx.lineTo(o.x + vx - 5 * Math.cos(ang - 0.5), o.y + vy - 5 * Math.sin(ang - 0.5));
+      ctx.lineTo(o.x + vx - 5 * Math.cos(ang + 0.5), o.y + vy - 5 * Math.sin(ang + 0.5));
+      ctx.closePath(); ctx.fillStyle = '#cbd5e1'; ctx.fill();
+    }
+  }
+
+  // region R fill (tinted by curl sign)
+  const a0 = W2S({ x: R.x0, y: R.y0 }), a1 = W2S({ x: R.x1, y: R.y1 });
+  const rx = Math.min(a0.x, a1.x), ry = Math.min(a0.y, a1.y);
+  const rw = Math.abs(a1.x - a0.x), rh = Math.abs(a1.y - a0.y);
+  ctx.fillStyle = curl >= 0 ? 'rgba(16,185,129,0.12)' : 'rgba(244,63,94,0.10)';
+  ctx.fillRect(rx, ry, rw, rh);
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5; ctx.strokeRect(rx, ry, rw, rh);
+
+  // counterclockwise circulation arrows on the boundary
+  const cor = [{ x: R.x0, y: R.y0 }, { x: R.x1, y: R.y0 }, { x: R.x1, y: R.y1 }, { x: R.x0, y: R.y1 }];
+  ctx.strokeStyle = '#e11d48'; ctx.fillStyle = '#e11d48'; ctx.lineWidth = 2;
+  for (let e = 0; e < 4; e++) {
+    const s0 = W2S(cor[e]), s1 = W2S(cor[(e + 1) % 4]);
+    const mx = (s0.x + s1.x) / 2, my = (s0.y + s1.y) / 2;
+    const ang = Math.atan2(s1.y - s0.y, s1.x - s0.x);
+    ctx.beginPath(); ctx.moveTo(mx, my);
+    ctx.lineTo(mx - 11 * Math.cos(ang - 0.45), my - 11 * Math.sin(ang - 0.45));
+    ctx.lineTo(mx - 11 * Math.cos(ang + 0.45), my - 11 * Math.sin(ang + 0.45));
+    ctx.closePath(); ctx.fill();
+  }
+  // draggable corner handles
+  ctx.fillStyle = '#1d4ed8';
+  [{ x: R.x0, y: R.y0 }, { x: R.x1, y: R.y1 }].forEach(pt => {
+    const s = W2S(pt);
+    ctx.beginPath(); ctx.arc(s.x, s.y, 6, 0, 2 * Math.PI); ctx.fill();
+  });
+  ctx.fillStyle = '#1d4ed8'; ctx.font = 'bold 14px ui-sans-serif';
+  ctx.fillText('R', W2S({ x: (R.x0 + R.x1) / 2, y: (R.y0 + R.y1) / 2 }).x - 6, W2S({ x: 0, y: (R.y0 + R.y1) / 2 }).y);
+
+  // readouts
+  const area = Math.abs((R.x1 - R.x0) * (R.y1 - R.y0));
+  const rhs = curl * area;
+  const lhs = circulation();
+  document.getElementById('curl').textContent = curl.toFixed(2);
+  document.getElementById('area').textContent = area.toFixed(2);
+  document.getElementById('lhs').textContent = lhs.toFixed(3);
+  document.getElementById('rhs').textContent = rhs.toFixed(3);
+  document.getElementById('diff').textContent = (lhs - rhs).toFixed(4);
+}
+
+function pick(e) {
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  const near = (px, py) => (px - m.x) ** 2 + (py - m.y) ** 2 < 0.12;
+  if (near(R.x0, R.y0)) drag = 'min';
+  else if (near(R.x1, R.y1)) drag = 'max';
+  else drag = null;
+}
+cv.addEventListener('pointerdown', e => { pick(e); if (drag) cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  const cx = Math.max(-2.8, Math.min(2.8, m.x)), cy = Math.max(-2.8, Math.min(2.8, m.y));
+  if (drag === 'min') { R.x0 = Math.min(cx, R.x1 - 0.4); R.y0 = Math.min(cy, R.y1 - 0.4); }
+  else { R.x1 = Math.max(cx, R.x0 + 0.4); R.y1 = Math.max(cy, R.y0 + 0.4); }
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = null);
+
+function bindSlider(id, vid, set) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = (+el.value).toFixed(1); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('a', 'av', v => a = v);
+bindSlider('b', 'bv', v => b = v);
+bindSlider('c', 'cv2', v => c = v);
+bindSlider('d', 'dv', v => d = v);
+
+function setF(va, vb, vc, vd) {
+  a = va; b = vb; c = vc; d = vd;
+  document.getElementById('a').value = va; document.getElementById('av').textContent = va.toFixed(1);
+  document.getElementById('b').value = vb; document.getElementById('bv').textContent = vb.toFixed(1);
+  document.getElementById('c').value = vc; document.getElementById('cv2').textContent = vc.toFixed(1);
+  document.getElementById('d').value = vd; document.getElementById('dv').textContent = vd.toFixed(1);
+  draw();
+}
+document.getElementById('rot').onclick = () => setF(0, -1, 1, 0);   // (-y, x): curl 2
+document.getElementById('grad').onclick = () => setF(1, 0, 0, 1);   // (x, y): curl 0
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`\oint_C M\,dx+N\,dy=\iint_R\!\left(N_x-M_y\right)dx\,dy`, document.getElementById('gt'));
+    katex.render(String.raw`\mathbf F=(M,N)`, document.getElementById('Fdef'));
+    katex.render(String.raw`N_x-M_y=c-b`, document.getElementById('curldef'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

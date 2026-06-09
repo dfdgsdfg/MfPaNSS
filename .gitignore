@@ -1,0 +1,13 @@
+# Per-cohort raw / ad-hoc material: videos, captions, members-only notes, and
+# persona-generated study visuals — local only, never committed.
+# NOTE: matches `0K-season/` but NOT `0K-season-assets/`, which is intentionally
+# TRACKED (note visualizations committed alongside the .md — see
+# .claude/rules/visualization.rule.md).
+**/*-season/
+
+# macOS
+.DS_Store
+
+# Lecture-note PDFs — the original and the per-unit splits are kept local only,
+# downloaded/regenerated on demand via the `lecture-pdf-split` skill, never committed.
+*.pdf

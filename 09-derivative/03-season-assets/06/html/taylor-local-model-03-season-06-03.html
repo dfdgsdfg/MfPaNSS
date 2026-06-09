@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>03. 전개 중심 a와 국소 모델-09강 3기 06강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">테일러 급수와 극한을 이용해서 미분 가능성의 정의 이해하기 (뉴진수 6강)-09강 3기 06강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">03. 전개 중심 a와 국소 모델</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    중심 <b class="text-amber-600">a</b> 근처에서 함수를 <span id="taydef"></span> 로 근사합니다.
+    항을 몇 개 쓰느냐는 그 점 근처를 <b>몇 차 함수</b>로 볼지와 같은 말입니다 —
+    <span class="font-mono">1차=수평선, 2차=접선, 3차=포물선…</span>.
+    <b class="text-amber-600">중심 a를 드래그</b>하고 <b>차수 슬라이더</b>를 움직여,
+    중심 근처에선 잘 맞다가 멀어지면 어긋나는 것을 직접 보세요.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">함수 f
+          <select id="fn" class="w-full mt-1 text-sm border border-slate-300 rounded px-1 py-1">
+            <option value="exp">exp(x)</option>
+            <option value="sin">sin(x)</option>
+            <option value="cos">cos(x)</option>
+            <option value="log1p">ln(1+x)</option>
+          </select></label>
+        <label class="block text-sm">차수 n <span id="nv" class="float-right font-mono text-slate-500"></span>
+          <input id="n" type="range" min="0" max="8" step="1" value="2" class="w-full accent-amber-600" /></label>
+        <label class="block text-sm">중심 a <span id="av" class="float-right font-mono text-slate-500"></span>
+          <input id="a" type="range" min="-3" max="3" step="0.05" value="0" class="w-full accent-amber-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">a=0 으로</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">평가점 x*</span><span id="xs" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f(x*)</span><span id="ft" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">근사 P<sub>n</sub>(x*)</span><span id="pt" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">|오차|</span><span id="er" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        검은 곡선 = f, <span class="text-amber-600 font-semibold">주황</span> = 중심 a의 n차 테일러
+        다항식 <span class="font-mono">P<sub>n</sub></span>, <span class="text-rose-600 font-semibold">분홍 점선</span> = 평가점 x*에서의
+        세로 오차. 중심에서 멀어질수록 오차가 커집니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let N = 2, A = 0.0, FN = 'exp';
+let xstar = 1.0;                                         // evaluation point (draggable along x)
+let S = 60;                                              // px per unit
+let drag = null;
+const XMIN = -4, XMAX = 4, YMIN = -4, YMAX = 8;
+
+// f and its k-th derivative, evaluated at a point (closed forms -> exact Taylor coeffs)
+function deriv(name, k, x) {
+  switch (name) {
+    case 'exp':  return Math.exp(x);
+    case 'sin':  return Math.sin(x + k * Math.PI / 2);
+    case 'cos':  return Math.cos(x + k * Math.PI / 2);
+    case 'log1p':                                        // d^k/dx^k ln(1+x)
+      if (k === 0) return Math.log(1 + x);
+      let s = (k % 2 === 1) ? 1 : -1;
+      return s * factorial(k - 1) / Math.pow(1 + x, k);
+  }
+}
+function f(x) { return deriv(FN, 0, x); }
+function factorial(m) { let r = 1; for (let i = 2; i <= m; i++) r *= i; return r; }
+
+// n-th Taylor polynomial of FN about A, evaluated at x
+function taylor(x) {
+  let sum = 0;
+  for (let k = 0; k <= N; k++) sum += deriv(FN, k, A) / factorial(k) * Math.pow(x - A, k);
+  return sum;
+}
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(340, Math.round(css * 0.8));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+function W2S(p) {
+  const w = cv.clientWidth, h = cv.height / (window.devicePixelRatio || 1);
+  return { x: (p.x - XMIN) / (XMAX - XMIN) * w, y: h - (p.y - YMIN) / (YMAX - YMIN) * h };
+}
+function S2Wx(sx) { return XMIN + sx / cv.clientWidth * (XMAX - XMIN); }
+
+function curve(fn, color, width, dash) {
+  ctx.strokeStyle = color; ctx.lineWidth = width; ctx.setLineDash(dash || []);
+  ctx.beginPath();
+  let started = false;
+  for (let px = 0; px <= cv.clientWidth; px += 2) {
+    const xw = S2Wx(px), yw = fn(xw);
+    if (!isFinite(yw) || yw < YMIN - 50 || yw > YMAX + 50) { started = false; continue; }
+    const p = W2S({ x: xw, y: yw });
+    started ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+    started = true;
+  }
+  ctx.stroke(); ctx.setLineDash([]);
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cv.height / (window.devicePixelRatio || 1);
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = XMIN; i <= XMAX; i++) { const p = W2S({ x: i, y: 0 }); ctx.beginPath(); ctx.moveTo(p.x, 0); ctx.lineTo(p.x, h); ctx.stroke(); }
+  for (let j = YMIN; j <= YMAX; j++) { const p = W2S({ x: 0, y: j }); ctx.beginPath(); ctx.moveTo(0, p.y); ctx.lineTo(w, p.y); ctx.stroke(); }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let o = W2S({ x: 0, y: 0 });
+  ctx.beginPath(); ctx.moveTo(0, o.y); ctx.lineTo(w, o.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(o.x, 0); ctx.lineTo(o.x, h); ctx.stroke();
+
+  curve(f, '#0f172a', 2.6);                              // function
+  curve(taylor, '#d97706', 2.2);                         // Taylor polynomial
+
+  // center a marker on the function
+  const pa = W2S({ x: A, y: f(A) });
+  ctx.fillStyle = '#d97706'; ctx.beginPath(); ctx.arc(pa.x, pa.y, 6, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = '#92400e'; ctx.font = 'bold 13px ui-sans-serif'; ctx.fillText('a', pa.x + 8, pa.y - 8);
+
+  // evaluation point x* : vertical error bar between f(x*) and P_n(x*)
+  const fx = f(xstar), px = taylor(xstar);
+  const pf = W2S({ x: xstar, y: fx }), pp = W2S({ x: xstar, y: px });
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(pf.x, pf.y); ctx.lineTo(pp.x, pp.y); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(pf.x, pf.y, 4.5, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = '#d97706'; ctx.beginPath(); ctx.arc(pp.x, pp.y, 4.5, 0, 2 * Math.PI); ctx.fill();
+  // draggable handle on the x-axis
+  const ph = W2S({ x: xstar, y: 0 });
+  ctx.fillStyle = '#e11d48'; ctx.beginPath(); ctx.arc(ph.x, ph.y, 6, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = '#9f1239'; ctx.font = 'bold 12px ui-sans-serif'; ctx.fillText('x*', ph.x + 7, ph.y + 16);
+
+  document.getElementById('xs').textContent = xstar.toFixed(2);
+  document.getElementById('ft').textContent = fx.toFixed(3);
+  document.getElementById('pt').textContent = px.toFixed(3);
+  document.getElementById('er').textContent = Math.abs(fx - px).toFixed(3);
+}
+
+// drag: grab the x* handle (anywhere near the bottom axis) or the center a marker
+function pick(e) {
+  const r = cv.getBoundingClientRect();
+  const sx = e.clientX - r.left, sy = e.clientY - r.top;
+  const pa = W2S({ x: A, y: f(A) });
+  if ((sx - pa.x) ** 2 + (sy - pa.y) ** 2 < 200) { drag = 'a'; return; }
+  drag = 'x';                                            // otherwise move evaluation point
+  xstar = Math.max(XMIN + 0.1, Math.min(XMAX - 0.1, S2Wx(sx)));
+  draw();
+}
+cv.addEventListener('pointerdown', e => { pick(e); if (drag) cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const xw = Math.max(XMIN + 0.1, Math.min(XMAX - 0.1, S2Wx(e.clientX - r.left)));
+  if (drag === 'a') { A = xw; document.getElementById('a').value = A.toFixed(2); document.getElementById('av').textContent = A.toFixed(2); }
+  else xstar = xw;
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = null);
+
+function bindSlider(id, vid, fmt, set) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(+el.value); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('n', 'nv', v => v.toFixed(0), v => N = v);
+bindSlider('a', 'av', v => v.toFixed(2), v => A = v);
+document.getElementById('fn').addEventListener('change', e => { FN = e.target.value; draw(); });
+document.getElementById('reset').onclick = () => {
+  A = 0; document.getElementById('a').value = 0; document.getElementById('av').textContent = '0.00'; draw();
+};
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`f(a)+f'(a)(x-a)+\tfrac{f''(a)}{2}(x-a)^2+\cdots`, document.getElementById('taydef'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

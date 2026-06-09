@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>5. 음함수와 그래디언트의 직교성-10강 3기 08강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">다변수 셋팅에서 미분의 직관 이해하기 (뉴진수 8강)-10강 3기 08강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">5. 음함수와 그래디언트의 직교성</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    레벨셋 <span id="lvldef"></span> 위에서 움직이면 <span class="font-mono">F</span> 값은 늘 0이라
+    접방향 <b class="text-blue-600">d</b> 에 대한 방향도함수 <span id="ddef"></span> 가 0입니다.
+    그래서 <b class="text-rose-600">그래디언트 ∇F</b> 는 레벨셋에 <b>수직</b>이고, 접선은 그것과 직교합니다.
+    점 <b>P</b> 를 곡선 위에서 끌어 보거나 슬라이더로 레벨 <span class="font-mono">c</span> 를 바꿔 다른 레벨셋으로 옮겨 보세요.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">레벨 c <span id="cv_v" class="float-right font-mono text-slate-500"></span>
+          <input id="lc" type="range" min="0.2" max="6.25" step="0.05" value="1" class="w-full accent-emerald-600" /></label>
+        <label class="block text-sm">점 각도 φ <span id="phi_v" class="float-right font-mono text-slate-500"></span>
+          <input id="phi" type="range" min="0" max="360" step="1" value="35" class="w-full accent-blue-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="unit" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">단위원 (c=1)</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">P</span><span id="pt" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">∇F = (2x, 2y)</span><span id="grad" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">접방향 d = (-y, x)</span><span id="tan" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">⟨∇F, d⟩</span><span id="dot" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">dy/dx = -Fx/Fy</span><span id="slope" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        <span id="ffull"></span><br>
+        접방향은 <span class="font-mono">Fx·dx + Fy·dy = 0</span> 를 만족하고, 거기서 <span class="font-mono">dy/dx = -Fx/Fy</span> 가 나옵니다.
+        수직 접선(곡선 위·아래 끝)에서는 <span class="font-mono">Fy=0</span> 이라 <span class="font-mono">dy/dx</span> 가 발산합니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let C = 1;                                   // level: F = x^2 + y^2 - C = 0  ->  radius sqrt(C)
+let phi = 35 * Math.PI / 180;                // angle of point P on the circle
+let S = 70;
+let drag = false;
+
+function radius() { return Math.sqrt(C); }
+function P() { const r = radius(); return { x: r * Math.cos(phi), y: r * Math.sin(phi) }; }
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(320, Math.round(css * 0.78));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css, h) / 7.2;                // fit roughly +-3.5 units
+  draw();
+}
+function W2S(p) { return { x: cv.clientWidth / 2 + p.x * S, y: cv.clientHeight / 2 - p.y * S }; }
+function S2W(sx, sy) { return { x: (sx - cv.clientWidth / 2) / S, y: -(sy - cv.clientHeight / 2) / S }; }
+
+function arrow(from, to, color, label) {
+  const o = W2S(from), t = W2S(to);
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+  const a = Math.atan2(t.y - o.y, t.x - o.x), hh = 11;
+  ctx.beginPath(); ctx.moveTo(t.x, t.y);
+  ctx.lineTo(t.x - hh*Math.cos(a-0.4), t.y - hh*Math.sin(a-0.4));
+  ctx.lineTo(t.x - hh*Math.cos(a+0.4), t.y - hh*Math.sin(a+0.4));
+  ctx.closePath(); ctx.fill();
+  if (label) { ctx.font = 'bold 15px ui-sans-serif'; ctx.fillText(label, t.x + 8, t.y - 6); }
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cv.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -4; i <= 4; i++) {
+    let a = W2S({x:i,y:-4}), b = W2S({x:i,y:4});
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    a = W2S({x:-4,y:i}); b = W2S({x:4,y:i});
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let a = W2S({x:-4,y:0}), b = W2S({x:4,y:0});
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  a = W2S({x:0,y:-4}); b = W2S({x:0,y:4});
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  // faint other level sets (dotted) to show the family F = const
+  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; ctx.setLineDash([2,3]);
+  for (const cc of [0.5, 2, 4, 6]) {
+    ctx.beginPath();
+    for (let k = 0; k <= 80; k++) {
+      const tt = k/80*2*Math.PI, p = W2S({x: Math.sqrt(cc)*Math.cos(tt), y: Math.sqrt(cc)*Math.sin(tt)});
+      k ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y);
+    }
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  // the active level set F = x^2 + y^2 - C = 0
+  ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let k = 0; k <= 160; k++) {
+    const tt = k/160*2*Math.PI, p = W2S({x: radius()*Math.cos(tt), y: radius()*Math.sin(tt)});
+    k ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y);
+  }
+  ctx.stroke();
+
+  const p = P();
+  // tangent line through P: direction (-y, x)
+  let tg = { x: -p.y, y: p.x };
+  const tlen = Math.hypot(tg.x, tg.y) || 1; tg = { x: tg.x/tlen, y: tg.y/tlen };
+  const ext = 2.0;
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 2.5;
+  let s1 = W2S({x: p.x - tg.x*ext, y: p.y - tg.y*ext});
+  let s2 = W2S({x: p.x + tg.x*ext, y: p.y + tg.y*ext});
+  ctx.beginPath(); ctx.moveTo(s1.x, s1.y); ctx.lineTo(s2.x, s2.y); ctx.stroke();
+  // gradient arrow at P (scaled down so it stays on screen)
+  const g = { x: 2*p.x, y: 2*p.y };
+  const gscale = 0.6;
+  arrow(p, { x: p.x + g.x*gscale, y: p.y + g.y*gscale }, '#e11d48', '∇F');
+  // right-angle marker between gradient and tangent
+  const gn = Math.hypot(g.x, g.y) || 1;
+  const gu = { x: g.x/gn, y: g.y/gn };
+  const m = 0.28;
+  const c1 = W2S({x: p.x + gu.x*m, y: p.y + gu.y*m});
+  const c2 = W2S({x: p.x + gu.x*m + tg.x*m, y: p.y + gu.y*m + tg.y*m});
+  const c3 = W2S({x: p.x + tg.x*m, y: p.y + tg.y*m});
+  ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.moveTo(c1.x, c1.y); ctx.lineTo(c2.x, c2.y); ctx.lineTo(c3.x, c3.y); ctx.stroke();
+  // point P
+  const sp_ = W2S(p);
+  ctx.fillStyle = '#111827'; ctx.beginPath(); ctx.arc(sp_.x, sp_.y, 5, 0, 2*Math.PI); ctx.fill();
+  ctx.font = 'bold 14px ui-sans-serif'; ctx.fillText('P', sp_.x + 8, sp_.y + 16);
+  ctx.fillStyle = '#2563eb'; ctx.font = '12px ui-sans-serif';
+  ctx.fillText('접선 (tangent)', s2.x + 6, s2.y);
+
+  // readouts
+  const dot = g.x*tg.x + g.y*tg.y;
+  document.getElementById('pt').textContent   = `(${p.x.toFixed(2)}, ${p.y.toFixed(2)})`;
+  document.getElementById('grad').textContent = `(${g.x.toFixed(2)}, ${g.y.toFixed(2)})`;
+  document.getElementById('tan').textContent  = `(${tg.x.toFixed(2)}, ${tg.y.toFixed(2)})`;
+  document.getElementById('dot').textContent  = (Math.abs(dot) < 1e-9 ? 0 : dot).toFixed(3);
+  document.getElementById('slope').textContent = Math.abs(p.y) < 1e-3 ? '±∞ (수직 접선)' : (-p.x/p.y).toFixed(3);
+}
+
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  const p = P();
+  if ((p.x-m.x)**2 + (p.y-m.y)**2 < 0.25) { drag = true; cv.setPointerCapture(e.pointerId); }
+});
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  phi = Math.atan2(m.y, m.x);               // snap onto the active circle by angle
+  document.getElementById('phi').value = ((phi*180/Math.PI)+360)%360;
+  document.getElementById('phi_v').textContent = Math.round(((phi*180/Math.PI)+360)%360) + '°';
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = false);
+
+function bindSlider(id, vid, set, fmt) {
+  const el = document.getElementById(id), out = document.getElementById(vid);
+  const upd = () => { set(parseFloat(el.value)); out.textContent = fmt(parseFloat(el.value)); draw(); };
+  el.addEventListener('input', upd); upd();
+}
+bindSlider('lc', 'cv_v', x => C = x, x => x.toFixed(2));
+bindSlider('phi', 'phi_v', x => phi = x*Math.PI/180, x => Math.round(x) + '°');
+document.getElementById('unit').onclick = () => {
+  document.getElementById('lc').value = 1; C = 1;
+  document.getElementById('cv_v').textContent = '1.00'; draw();
+};
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`F(x,y)=x^2+y^2-c=0`, document.getElementById('lvldef'));
+    katex.render(String.raw`\langle\nabla F, d\rangle`, document.getElementById('ddef'));
+    katex.render(String.raw`F(x,y)=x^2+y^2-c,\quad \nabla F=(2x,\,2y)`, document.getElementById('ffull'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

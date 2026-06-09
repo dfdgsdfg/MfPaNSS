@@ -1,0 +1,26 @@
+#separator:tab
+#html:true
+#notetype:Basic
+#columns:Front	Back	Tags
+다음을 미분하시오 (연쇄법칙).<br>\( \sin(x^2) \)	\( 2x\cos(x^2) \)<br>바깥 \(\sin\) 미분 \(\cos(x^2)\), 안쪽 \(x^2\) 미분 \(2x\). (영상에서 한 분이 처음 \(-2\)로 더듬다 \(\cos(x^2)\cdot 2x\)로 정정.)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 연쇄법칙
+다음을 미분하시오 (정의역 주의).<br>\( \ln(x^3) \)	\( \dfrac{3}{x} \quad (x>0) \)<br>\( \ln(x^3)=3\ln x \) 또는 연쇄법칙 \( \dfrac{1}{x^3}\cdot 3x^2=\dfrac{3}{x} \).	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 연쇄법칙
+다음을 미분하시오 (기본꼴, 퍼즈 없이).<br>\( \sin x \)	\( \cos x \)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 삼각함수
+다음을 미분하시오 (기본꼴, 퍼즈 없이).<br>\( \cos x \)	\( -\sin x \)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 삼각함수
+다음을 미분하시오 (기본꼴, 퍼즈 없이).<br>\( \tan x \)	\( \sec^2 x \quad (=\tan^2 x + 1) \)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 삼각함수
+다음을 미분하시오 (정의역 주의).<br>\( \ln x \)	\( \dfrac{1}{x} \quad (x>0) \)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 로그함수
+다음을 미분하시오 (밑이 \(e\)인 지수).<br>\( e^{x} \)	\( e^{x} \)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 지수함수
+다음 다항함수를 미분하시오.<br>\( 2x^2 + 3x + 1 \)	\( 4x + 3 \)<br>항별 거듭제곱 법칙: \( 4x + 3 + 0 \).	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 다항함수
+다음의 부정적분을 구하시오 (미분의 역연산).<br>\( \displaystyle\int \dfrac{1}{x}\,dx \)	\( \ln|x| + C \)<br>\( (\ln x)'=\dfrac1x \) 이므로 \(\dfrac1x\)의 적분은 \(\ln|x|+C\).	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 적분
+다음의 부정적분을 구하시오 (\(\sin(x^2)\)의 미분을 거꾸로).<br>\( \displaystyle\int 2x\cos(x^2)\,dx \)	\( \sin(x^2) + C \)<br>\( \big(\sin(x^2)\big)'=2x\cos(x^2) \) 이므로 그 역연산. (치환 \(u=x^2\).)	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 적분
+다음의 부정적분을 구하시오 (기본꼴).<br>\( \displaystyle\int \sin x\,dx \)	\( -\cos x + C \)<br>부호 주의: \(\sin\)의 적분에는 \(-\)가 붙는다.	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 적분
+다음의 부정적분을 구하시오 (정의역 주의).<br>\( \displaystyle\int \tan x\,dx \)	\( -\ln|\cos x| + C \)<br>\( \big(\ln|\cos x|\big)'=-\tan x \) 이므로 그 역연산.	MfPaNSS 04-season-21 09-Derivative ko-kr 계산 적분
+1변수 미분(도함수)을 특징짓는 두 가지 성질(룰)을 진술하시오.	(1) 연쇄법칙(체인룰): 합성함수의 미분 \( (f\circ g)' = (f'\circ g)\cdot g' \).<br>(2) 곱의 미분법(프로덕트룰=라이프니츠룰): \( (fg)' = f'g + fg' \).<br>강사: 이 두 룰을 만족하는 선형연산자이면 사실상 미분이라 부른다.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 정리
+연쇄법칙(체인룰)이 다루는 대상과 그 진술을 말하시오.	합성함수의 미분법.<br>\( \dfrac{d}{dx}f(g(x)) = f'(g(x))\cdot g'(x) \) — 바깥함수 미분 \(\times\) 안쪽함수 미분.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 연쇄법칙
+곱의 미분법(프로덕트룰/라이프니츠룰)을 진술하시오.	\( (fg)' = f'g + fg' \) — 곱해진 두 함수의 미분.<br>강사: 영국식이면 라이프니츠룰, 그 외엔 프로덕트룰로 부른다.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 곱의미분
+적분을 특징짓는 두 가지 성질(룰)을 진술하시오.	(1) 치환적분(change of variable): 합성함수의 미분법(연쇄법칙)에 대응.<br>(2) 부분적분(integration by parts): 곱함수의 미분법(곱의 미분법)에 대응.<br>강사: 이 두 룰이 적분의 성질이며, 미분의 두 룰과 호환되지 않아서 적분이 어려워진다.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 정리
+미분과 적분이 미적분학의 맥락에 들어오는 까닭(선형대수와의 연결)을 설명하시오.	선형적이지 않은 일반 함수를 국소적으로 선형(선형함수)으로 바꾸는 행위가 미분(=야코비안 행렬을 추출하는 행위)이고, 그것을 역으로 되돌리는 행위가 적분이다.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 정의
+미분(도함수)을 형식적으로(formal) 정의하면 무엇인가?	두 가지 성질(연쇄법칙·곱의 미분법)을 만족하는 선형연산자(linear transformation). 즉 함수를 선형함수로 바꾸는(선형화하는) 연산이며, 형식적으로는 야코비안 행렬을 추출하는 행위.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 정의
+적분도 선형연산자인가? 미분과의 공통점·차이를 진술하시오.	그렇다 — 미분과 적분은 모두 선형연산자(리니어 트랜스포메이션)라 선형대수의 대상이다. 다만 일반 선형연산자가 아니라, 각자 고유한 두 성질(미분: 연쇄·곱의 미분 / 적분: 치환·부분적분)을 만족하는 특수한 선형연산자로 정의된다.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 정의
+선형함수의 합성과 행렬의 곱이 왜 일치하는지 설명하시오.	선형함수는 행렬의 또 다른 표기이다. 두 선형함수를 합성한 결과를 행렬 곱셈 꼴로 적으면, 합성으로 얻은 함수의 행렬과 두 행렬의 곱이 정확히 같다. (단, 이미 선형인 경우에 한해 합성과 곱이 일치한다.)	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 행렬
+미분에서 곱함수의 선형화와 합성함수의 선형화를 굳이 구분하는 이유는?	이미 선형인 함수에서는 합성과 곱이 일치하지만, 미분은 아직 선형이 아닌 함수를 선형화하는 행위이므로 "두 함수의 곱의 선형화"와 "두 함수의 합성의 선형화"가 펀더멘털하게 다르다. 그래서 곱의 미분법(프로덕트룰)과 연쇄법칙(체인룰)을 구분해 다룬다.	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 정리
+자연계의 적분에 대한 강사의 진술(계산 가능성)을 말하시오.	자연계에 존재하는 적분의 대부분(약 99% 이상)은 인간이 손으로 계산할 수 없다. 교과서에서 보는 적분은 예외적으로 계산 가능한 운 좋은 경우들뿐이다 (예: \( \int x^{x} dx \), \( \int x^{\sin x} dx \) 등은 초등함수로 불가능).	MfPaNSS 04-season-21 09-Derivative ko-kr 암기 적분

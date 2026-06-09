@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>10. 그래디언트장의 선적분과 경로 독립성-12강 3기 11강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; cursor: grab; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">선적분의 기본정리에 대한 직관, 다변수 함수의 최적화와 곡면 (뉴진수 11강)-12강 3기 11강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">10. 그래디언트장의 선적분과 경로 독립성</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    높이 함수 <span id="fdef"></span> 의 그래디언트장 <span id="gdef"></span> 위에서, 시작점 <b class="text-slate-700">A</b> 와 끝점 <b class="text-slate-700">B</b> 를
+    잇는 경로 하나를 <b>중간 제어점 <span class="text-violet-600">C</span></b> 를 끌어 휘게 만들어 보세요.
+    경로가 아무리 휘어도 선적분 <span id="lidef"></span> 값은 항상 <span id="ftcdef"></span> 로 똑같습니다 — 이것이 <b>경로 독립</b>입니다.
+    <b class="text-blue-600">A</b>·<b class="text-rose-600">B</b> 도 끌어 옮길 수 있습니다.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">리만 합 분할 수 n <span id="nv" class="float-right font-mono text-slate-500"></span>
+          <input id="n" type="range" min="4" max="120" step="1" value="24" class="w-full accent-blue-600" /></label>
+        <div class="flex gap-2 pt-1">
+          <button id="straight" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">직선 경로</button>
+          <button id="reset" class="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">리셋</button>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">f(A)</span><span id="fA" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">f(B)</span><span id="fB" class="font-mono"></span></div>
+        <div class="flex justify-between font-semibold"><span class="text-slate-600">f(B) − f(A)</span><span id="ftc" class="font-mono text-emerald-600"></span></div>
+        <hr class="border-slate-100" />
+        <div class="flex justify-between"><span class="text-slate-500">∮ 경로 선적분 (n조각)</span><span id="li" class="font-mono text-blue-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">오차</span><span id="err" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        각 조각에서 <span class="font-mono">∇f·Δr</span> 를 더합니다. 분할 n 을 키울수록 리만 합이
+        <span class="font-mono">f(B)−f(A)</span> 로 수렴합니다. <b>곡면을 계속 떠올리는 대신</b>,
+        "각 점의 벡터 ∇f 와 실제 이동 방향의 내적"을 누적한다고 보면 됩니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+// height function f = x^2 + y^2 ; gradient field grad f = (2x, 2y)
+const f    = (x, y) => x * x + y * y;
+const grad = (x, y) => ({ x: 2 * x, y: 2 * y });
+
+let A = { x: -1.0, y: 0.0 };          // start (world coords)
+let B = { x: 2.0, y: 1.0 };           // end
+let C = { x: 0.4, y: -1.4 };          // bend control point (drag to curve the path)
+const A0 = { ...A }, B0 = { ...B }, C0 = { ...C };
+let N = 24;
+let S = 60, drag = null;
+
+// quadratic Bezier A -> C -> B, evaluated at parameter s in [0,1]
+function path(s) {
+  const m = 1 - s;
+  return {
+    x: m * m * A.x + 2 * m * s * C.x + s * s * B.x,
+    y: m * m * A.y + 2 * m * s * C.y + s * s * B.y,
+  };
+}
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(320, Math.round(css * 0.82));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css * dpr; cv.height = h * dpr;
+  cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  S = Math.min(css, h) / 6.6;                  // fit roughly x,y in [-3, 3]
+  draw();
+}
+function W2S(p) { return { x: cv.clientWidth / 2 + p.x * S, y: cv.clientHeight / 2 - p.y * S }; }
+function S2W(sx, sy) { return { x: (sx - cv.clientWidth / 2) / S, y: -(sy - cv.clientHeight / 2) / S }; }
+function cssH() { return cv.height / (window.devicePixelRatio || 1); }
+
+// Riemann sum of the line integral ∫ grad f · dr over the bezier path
+function lineIntegral(n) {
+  let sum = 0, prev = path(0);
+  for (let i = 1; i <= n; i++) {
+    const cur = path(i / n);
+    const mid = { x: (prev.x + cur.x) / 2, y: (prev.y + cur.y) / 2 };
+    const g = grad(mid.x, mid.y);
+    sum += g.x * (cur.x - prev.x) + g.y * (cur.y - prev.y);   // ∇f(mid) · Δr
+    prev = cur;
+  }
+  return sum;
+}
+
+function dot(p, color, label, r = 6) {
+  const t = W2S(p);
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.arc(t.x, t.y, r, 0, 2 * Math.PI); ctx.fill();
+  if (label) { ctx.fillStyle = '#0f172a'; ctx.font = 'bold 14px ui-sans-serif'; ctx.fillText(label, t.x + 9, t.y - 8); }
+}
+
+function draw() {
+  const w = cv.clientWidth, h = cssH();
+  ctx.clearRect(0, 0, w, h);
+  // grid
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 1;
+  for (let i = -3; i <= 3; i++) {
+    let a = W2S({ x: i, y: -3 }), b = W2S({ x: i, y: 3 });
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    a = W2S({ x: -3, y: i }); b = W2S({ x: 3, y: i });
+    ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  }
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+  let a = W2S({ x: -3, y: 0 }), b = W2S({ x: 3, y: 0 });
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  a = W2S({ x: 0, y: -3 }); b = W2S({ x: 0, y: 3 });
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+  // level circles of f = x^2 + y^2 (equipotential lines)
+  ctx.strokeStyle = '#d1fae5'; ctx.lineWidth = 1.5;
+  for (const lvl of [1, 4, 9]) {
+    ctx.beginPath();
+    const rad = Math.sqrt(lvl);
+    for (let k = 0; k <= 80; k++) {
+      const th = k / 80 * 2 * Math.PI, p = W2S({ x: rad * Math.cos(th), y: rad * Math.sin(th) });
+      k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+    }
+    ctx.stroke();
+  }
+  // gradient field arrows
+  ctx.strokeStyle = '#94a3b8'; ctx.fillStyle = '#94a3b8'; ctx.lineWidth = 1.2;
+  for (let gx = -3; gx <= 3; gx++) for (let gy = -3; gy <= 3; gy++) {
+    const g = grad(gx, gy);
+    const len = Math.hypot(g.x, g.y) || 1;
+    const sc = 0.30 / Math.max(len, 1) * Math.min(len, 6);     // tame long arrows
+    const o = W2S({ x: gx, y: gy }), tip = W2S({ x: gx + g.x * sc, y: gy + g.y * sc });
+    ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(tip.x, tip.y); ctx.stroke();
+    const ang = Math.atan2(tip.y - o.y, tip.x - o.x);
+    ctx.beginPath(); ctx.moveTo(tip.x, tip.y);
+    ctx.lineTo(tip.x - 5 * Math.cos(ang - 0.5), tip.y - 5 * Math.sin(ang - 0.5));
+    ctx.lineTo(tip.x - 5 * Math.cos(ang + 0.5), tip.y - 5 * Math.sin(ang + 0.5));
+    ctx.closePath(); ctx.fill();
+  }
+  // the curved path (bezier), drawn as N straight Riemann segments
+  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) { const p = W2S(path(i / N)); i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); }
+  ctx.stroke();
+  // segment node dots
+  ctx.fillStyle = '#1d4ed8';
+  for (let i = 0; i <= N; i++) { const p = W2S(path(i / N)); ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, 2 * Math.PI); ctx.fill(); }
+  // control handle
+  ctx.strokeStyle = '#c4b5fd'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1;
+  let pa = W2S(A), pc = W2S(C), pb = W2S(B);
+  ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pc.x, pc.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+  ctx.setLineDash([]);
+  // endpoints + control
+  dot(A, '#2563eb', 'A'); dot(B, '#e11d48', 'B'); dot(C, '#7c3aed', 'C', 7);
+
+  // readouts
+  const fA = f(A.x, A.y), fB = f(B.x, B.y), ftc = fB - fA, li = lineIntegral(N);
+  document.getElementById('fA').textContent  = fA.toFixed(3);
+  document.getElementById('fB').textContent  = fB.toFixed(3);
+  document.getElementById('ftc').textContent = ftc.toFixed(3);
+  document.getElementById('li').textContent  = li.toFixed(3);
+  document.getElementById('err').textContent = (li - ftc).toFixed(4);
+}
+
+function pick(e) {
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  const near = p => (p.x - m.x) ** 2 + (p.y - m.y) ** 2 < 0.16;
+  drag = near(C) ? C : near(A) ? A : near(B) ? B : null;
+}
+cv.addEventListener('pointerdown', e => { pick(e); if (drag) cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const m = S2W(e.clientX - r.left, e.clientY - r.top);
+  drag.x = Math.max(-3, Math.min(3, m.x));
+  drag.y = Math.max(-3, Math.min(3, m.y));
+  draw();
+});
+cv.addEventListener('pointerup', () => drag = null);
+
+const nEl = document.getElementById('n'), nOut = document.getElementById('nv');
+nEl.addEventListener('input', () => { N = parseInt(nEl.value); nOut.textContent = N; draw(); });
+nOut.textContent = N;
+
+document.getElementById('straight').onclick = () => { C = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 }; draw(); };
+document.getElementById('reset').onclick    = () => { A = { ...A0 }; B = { ...B0 }; C = { ...C0 }; draw(); };
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    katex.render(String.raw`f=x^2+y^2`, document.getElementById('fdef'));
+    katex.render(String.raw`\nabla f=(2x,2y)`, document.getElementById('gdef'));
+    katex.render(String.raw`\int_A^B \nabla f\cdot d\mathbf r`, document.getElementById('lidef'));
+    katex.render(String.raw`f(B)-f(A)`, document.getElementById('ftcdef'));
+  }
+  resize();
+});
+</script>
+</body>
+</html>

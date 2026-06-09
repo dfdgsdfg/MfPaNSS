@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>3. 리만합: 면적을 직사각형으로 채우기-11강 3기 09강</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  canvas { touch-action: none; }
+  .stat { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <h1 class="text-xl font-bold">멕스웰 방정식, 음함수 미분법, 미적분학의 기본정리 (뉴진수 9강)-11강 3기 09강</h1>
+  <h2 class="mt-0.5 text-base font-semibold text-slate-500">3. 리만합: 면적을 직사각형으로 채우기</h2>
+  <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+    구간 <span id="abdef"></span> 를 <span class="font-mono">n</span> 등분하고 각 작은 구간 위에 직사각형을 세웁니다.
+    폭은 <span id="dxdef"></span>, 높이는 표본점에서의 함수값입니다. 직사각형 넓이를 모두 더한 것이 <b>리만합</b>
+    <span id="sumdef"></span> 이고, <span class="font-mono">n</span> 을 키우면 자투리가 줄어 정적분 <span id="intdef"></span> 으로 수렴합니다.
+    <span class="font-mono">n</span> 슬라이더를 끌고, 함수와 표본점(왼끝·중점·오른끝)을 바꿔 보세요.
+  </p>
+
+  <div class="mt-4 grid sm:grid-cols-[1fr_240px] gap-4">
+    <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-2">
+      <canvas id="cv" class="w-full rounded-lg"></canvas>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 space-y-3">
+        <label class="block text-sm">n (직사각형 개수) <span id="nv" class="float-right font-mono text-slate-500"></span>
+          <input id="n" type="range" min="1" max="120" step="1" value="8" class="w-full accent-blue-600" /></label>
+        <div>
+          <div class="text-sm mb-1">함수 f(x)</div>
+          <select id="fn" class="w-full text-sm border border-slate-300 rounded px-2 py-1">
+            <option value="sq">x²</option>
+            <option value="sin">sin(x)</option>
+            <option value="line">x + 0.5</option>
+            <option value="bell">e^(−x²)</option>
+          </select>
+        </div>
+        <div>
+          <div class="text-sm mb-1">표본점 (직사각형 높이)</div>
+          <div class="flex gap-1">
+            <button data-rule="left"  class="rulebtn text-xs px-2 py-1 rounded bg-blue-600 text-white">왼끝</button>
+            <button data-rule="mid"   class="rulebtn text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">중점</button>
+            <button data-rule="right" class="rulebtn text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200">오른끝</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <label class="block text-xs">a <input id="a" type="number" step="0.1" value="0" class="w-full border border-slate-300 rounded px-1 py-0.5 text-sm"/></label>
+          <label class="block text-xs">b <input id="b" type="number" step="0.1" value="1" class="w-full border border-slate-300 rounded px-1 py-0.5 text-sm"/></label>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm ring-1 ring-slate-200 p-3 text-sm stat space-y-1">
+        <div class="flex justify-between"><span class="text-slate-500">Δx</span><span id="dx" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">리만합 Sₙ</span><span id="sum" class="font-mono text-blue-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">정적분 ∫</span><span id="exact" class="font-mono text-rose-600"></span></div>
+        <div class="flex justify-between"><span class="text-slate-500">오차 |Sₙ−∫|</span><span id="err" class="font-mono"></span></div>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        Sₙ = Σ f(xₖ)·Δx,&nbsp; Δx = (b−a)/n. n→∞ 이면 Sₙ → ∫ₐᵇ f(x)dx. 자투리(곡선과 직사각형 사이 빈틈)가 오차입니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+
+// function library: f, its exact integral on [a,b], and a y-range for drawing
+const FNS = {
+  sq:   { f: x => x*x,            I: (a,b) => (b**3 - a**3)/3 },
+  sin:  { f: x => Math.sin(x),    I: (a,b) => Math.cos(a) - Math.cos(b) },
+  line: { f: x => x + 0.5,        I: (a,b) => (b*b - a*a)/2 + 0.5*(b-a) },
+  bell: { f: x => Math.exp(-x*x), I: (a,b) => Math.sqrt(Math.PI)/2*(erf(b) - erf(a)) },
+};
+// Abramowitz-Stegun erf approximation (for the exact value of the bell curve integral)
+function erf(z) {
+  const s = z < 0 ? -1 : 1; z = Math.abs(z);
+  const t = 1/(1 + 0.3275911*z);
+  const y = 1 - (((((1.061405429*t - 1.453152027)*t) + 1.421413741)*t - 0.284496736)*t + 0.254829592)*t*Math.exp(-z*z);
+  return s*y;
+}
+
+let n = 8, rule = 'left', fnKey = 'sq';
+function getAB() {
+  let a = parseFloat(document.getElementById('a').value);
+  let b = parseFloat(document.getElementById('b').value);
+  if (!isFinite(a)) a = 0; if (!isFinite(b)) b = 1;
+  if (b <= a) b = a + 1;
+  return [a, b];
+}
+
+function sampleX(left, dx) {
+  if (rule === 'left')  return left;
+  if (rule === 'right') return left + dx;
+  return left + dx/2;                       // mid
+}
+
+function riemann(f, a, b) {
+  const dx = (b - a)/n; let s = 0;
+  for (let k = 0; k < n; k++) s += f(sampleX(a + k*dx, dx)) * dx;
+  return s;
+}
+
+// view fitting
+let view = { xmin:0, xmax:1, ymin:0, ymax:1, pad:34 };
+function fitView(a, b, f) {
+  const xs = [], ys = [0];
+  for (let i = 0; i <= 200; i++) { const x = a + (b-a)*i/200; xs.push(x); ys.push(f(x)); }
+  view.xmin = a; view.xmax = b;
+  view.ymin = Math.min(0, ...ys); view.ymax = Math.max(...ys) * 1.1 || 1;
+  if (view.ymax === view.ymin) view.ymax = view.ymin + 1;
+}
+function X(x) { const w = cv.clientWidth, p = view.pad;
+  return p + (x - view.xmin)/(view.xmax - view.xmin)*(w - 2*p); }
+function Y(y) { const h = cv.height/(window.devicePixelRatio||1), p = view.pad;
+  return h - p - (y - view.ymin)/(view.ymax - view.ymin)*(h - 2*p); }
+
+function resize() {
+  const css = cv.clientWidth, h = Math.max(300, Math.round(css * 0.7));
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = css*dpr; cv.height = h*dpr; cv.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+
+function draw() {
+  const f = FNS[fnKey].f;
+  const [a, b] = getAB();
+  fitView(a, b, f);
+  const w = cv.clientWidth, h = cv.height/(window.devicePixelRatio||1);
+  ctx.clearRect(0, 0, w, h);
+
+  // axes
+  ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(X(view.xmin), Y(0)); ctx.lineTo(X(view.xmax), Y(0)); ctx.stroke();
+  const x0 = Math.max(view.xmin, Math.min(view.xmax, 0));
+  ctx.beginPath(); ctx.moveTo(X(x0), Y(view.ymin)); ctx.lineTo(X(x0), Y(view.ymax)); ctx.stroke();
+
+  // rectangles
+  const dx = (b - a)/n;
+  ctx.lineWidth = 1;
+  for (let k = 0; k < n; k++) {
+    const xl = a + k*dx, xs = sampleX(xl, dx), hgt = f(xs);
+    const px = X(xl), pw = X(xl + dx) - X(xl);
+    const py = Y(hgt), py0 = Y(0);
+    ctx.fillStyle = 'rgba(147,197,253,0.55)';
+    ctx.fillRect(px, Math.min(py, py0), pw, Math.abs(py0 - py));
+    ctx.strokeStyle = '#2563eb';
+    ctx.strokeRect(px, Math.min(py, py0), pw, Math.abs(py0 - py));
+    // sample dot on the curve
+    ctx.fillStyle = '#1d4ed8';
+    ctx.beginPath(); ctx.arc(X(xs), Y(hgt), 2.2, 0, 2*Math.PI); ctx.fill();
+  }
+
+  // curve
+  ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2.4; ctx.beginPath();
+  for (let i = 0; i <= 300; i++) { const x = a + (b-a)*i/300;
+    const px = X(x), py = Y(f(x)); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+  ctx.stroke();
+
+  // labels a, b
+  ctx.fillStyle = '#475569'; ctx.font = '12px ui-sans-serif';
+  ctx.fillText('a=' + a, X(a) - 4, Y(0) + 16);
+  ctx.fillText('b=' + b, X(b) - 8, Y(0) + 16);
+
+  // readouts
+  const sum = riemann(f, a, b), exact = FNS[fnKey].I(a, b);
+  document.getElementById('dx').textContent    = dx.toFixed(4);
+  document.getElementById('sum').textContent   = sum.toFixed(5);
+  document.getElementById('exact').textContent = exact.toFixed(5);
+  document.getElementById('err').textContent   = Math.abs(sum - exact).toExponential(2);
+  document.getElementById('nv').textContent    = n;
+}
+
+document.getElementById('n').addEventListener('input', e => { n = +e.target.value; draw(); });
+document.getElementById('fn').addEventListener('change', e => { fnKey = e.target.value; draw(); });
+document.getElementById('a').addEventListener('input', draw);
+document.getElementById('b').addEventListener('input', draw);
+document.querySelectorAll('.rulebtn').forEach(btn => btn.addEventListener('click', () => {
+  rule = btn.dataset.rule;
+  document.querySelectorAll('.rulebtn').forEach(b => {
+    b.classList.remove('bg-blue-600','text-white'); b.classList.add('bg-slate-100');
+  });
+  btn.classList.add('bg-blue-600','text-white'); btn.classList.remove('bg-slate-100');
+  draw();
+}));
+
+window.addEventListener('resize', resize);
+window.addEventListener('load', () => {
+  if (window.katex) {
+    const r = (tex, id) => katex.render(String.raw`${tex}`, document.getElementById(id));
+    r('[a,b]', 'abdef');
+    r('\\Delta x=\\tfrac{b-a}{n}', 'dxdef');
+    r('S_n=\\sum_{k} f(x_k)\\,\\Delta x', 'sumdef');
+    r('\\int_a^b f(x)\\,dx', 'intdef');
+  }
+  resize();
+});
+</script>
+</body>
+</html>
