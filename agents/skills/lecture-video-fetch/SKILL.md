@@ -117,7 +117,7 @@ This project organizes lectures into 17 unit folders (`NN-<slug>/`), and keeps e
 Work out the target **before** downloading:
 
 - **Season `0K-season`** — from the title's "N기": `…수학교실 2기]` → `02-season`; no "기" marker means 1기 → `01-season`; "뉴진수"/3기 → `03-season`; "4기" → `04-season`.
-- **Unit `NN-…`** — map the lecture to one of the 17 units. The repo's root `index.md` / `README.md` already list every video against its unit and 기, so look the video up there (by id or title) and use that unit folder. For a brand-new lecture, pick the unit whose topic matches and tell the user.
+- **Unit `NN-…`** — map the lecture to one of the 17 units. The repo's root `INDEX.md` / `README.md` already list every video against its unit and 기, so look the video up there (by id or title) and use that unit folder. For a brand-new lecture, pick the unit whose topic matches and tell the user.
 - **Lecture `<LL>`** — the 강 번호 from the title (e.g. `…4기] 19.` → `19`); the same number used in the note/asset naming.
 
 Then point the download/caption commands at `<repo>/<NN-unit>/<0K>-season/<LL>/` — e.g. the 4기 19강 geometry lecture lands in `07-linalg-3-geometry/04-season/19/`. (If you're not inside this repo structure, fall back to a clear working folder and say where things landed.)

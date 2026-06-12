@@ -8,7 +8,7 @@ A **study-material repository, not a software project** — there is no build, l
 
 ## Layout & content model
 
-17 unit folders `NN-<slug>/` (`01-sets` … `17-statistics`), one per "렉처노트" topic — the canonical map is `README.md` (unit table) and `index.md` (full 100-video index across 4 cohorts + lecture-note × season grid). Each unit folder mixes several artifact types (see `README.md` → 구성):
+17 unit folders `NN-<slug>/` (`01-sets` … `17-statistics`), one per "렉처노트" topic — the canonical map is `README.md` (unit table) and `INDEX.md` (full 100-video index across 4 cohorts + lecture-note × season grid). Each unit folder mixes several artifact types (see `README.md` → 구성):
 
 - `NN. <Title>.md` — **transcript**, OCR'd / reconstructed from the original PDF.
 - `NN. <Title>-0K-season-LL.md` — **video note** for cohort `0K` (기), lecture `LL`, written from a YouTube lecture.
@@ -31,7 +31,7 @@ Skill pipeline for turning a lecture into material:
 ## Conventions that bite if missed
 
 - **Season-folder split**: `0K-season/` is gitignored (`**/*-season/`); `0K-season-assets/` is intentionally **tracked**. A file whose *name* ends `-0K-season-LL` is **not** a season folder and **is** tracked. (`.gitignore` documents this.)
-- **Membership gating**: public-video notes/decks sit at the unit-folder root, are tracked, and are linked in `index.md`/`README.md`; **members-only** ones go in the gitignored `0K-season/` and are **never listed** in the tracked index (leave that cell `—`).
+- **Membership gating**: public-video notes/decks sit at the unit-folder root, are tracked, and are linked in `INDEX.md`/`README.md`; **members-only** ones go in the gitignored `0K-season/` and are **never listed** in the tracked index (leave that cell `—`).
 - **PDFs are gitignored** (`*.pdf`). The original 224-page note lives on Google Drive (linked in `README.md`); regenerate per-unit PDFs locally with `lecture-pdf-split`.
 - **Visualizations** follow `agents/rules/visualization.rule.md` (imported below): Mermaid / SVG / HTML / ipynb, and which output goes to `0K-season-assets/` (tracked, note skill) vs `0K-season/` (gitignored, persona/CLI).
 - **Note voice** (see `lecture-video-notes/SKILL.md`): lecturer's first-person Korean, plain tone (no "핵심/통찰/놀라운"), always keep the lecture's questions / 생각해볼 점, math in LaTeX, no class housekeeping.

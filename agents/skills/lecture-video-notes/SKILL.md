@@ -156,9 +156,9 @@ Name the note `<NN. Unit Title>-0K-season-LL.md` where **`0K`** = cohort/기 and
   `<NN-unit>/0K-season/<LL>/<NN. Unit Title>-0K-season-LL.md`
   e.g. `07-linalg-3-geometry/02-season/07/07. Linear Algebra Part 3 - Linear Algebra and Geometry-02-season-07.md`.
 
-Find the unit/season the way `lecture-video-fetch` does — look the video up in the repo's `index.md` / `README.md` (unit + 기), season from the title's "N기". The `0K-season/` folder is gitignored (`**/*-season/`); a `.md`/`.tsv` file whose *name* ends in `-0K-season-LL` is **not** caught by that (it matches season *folders*). If the repo structure isn't present, use a clear descriptive name and tell the user where it landed.
+Find the unit/season the way `lecture-video-fetch` does — look the video up in the repo's `INDEX.md` / `README.md` (unit + 기), season from the title's "N기". The `0K-season/` folder is gitignored (`**/*-season/`); a `.md`/`.tsv` file whose *name* ends in `-0K-season-LL` is **not** caught by that (it matches season *folders*). If the repo structure isn't present, use a clear descriptive name and tell the user where it landed.
 
-When listing notes/decks in the repo index (`index.md` / `README`), link **only public-video** notes and Anki decks. A members-only note still gets written (into its gitignored `0K-season/<LL>/` folder for personal use), but it is **not** advertised in the tracked index — keep that row's note/deck cell as `—`.
+When listing notes/decks in the repo index (`INDEX.md` / `README`), link **only public-video** notes and Anki decks. A members-only note still gets written (into its gitignored `0K-season/<LL>/` folder for personal use), but it is **not** advertised in the tracked index — keep that row's note/deck cell as `—`.
 
 
 ## Quick self-check before handing off

@@ -31,9 +31,7 @@
 ---
 
 ## 단원 목록
-[세부목차](index.md) 참고
-
-> 원본 강의 노트 PDF(통합본·강의별 분할본 모두)는 저장소에서 제거했습니다. 원본 노트는 한 곳에서 보실 수 있습니다 — **[원본 노트 (PDF · Google Drive)](https://drive.google.com/file/d/1JCb7mX5I5r37BxibXv8_5VKoMwTrhZV_/view?usp=share_link)**. 아래 표의 *원본 노트 페이지* 열이 각 단원이 원본의 몇 페이지에 해당하는지 알려줍니다. (Google Drive 뷰어는 특정 페이지로의 직접 링크를 지원하지 않으므로, 링크를 연 뒤 해당 페이지로 이동해 주세요.)
+[세부목차](INDEX.md) 참고
 
 | # | 폴더 | 문서 (md) | 원본 노트 페이지 |
 |---|---|---|---|
@@ -64,6 +62,10 @@
 - 튜터: [`math-tutor.persona.md`](agents/personas/math-tutor.persona.md)
 - 퀴즈 진행자:[`quiz-master.persona.md`](agents/personas/quiz-master.persona.md)
 
+아래에서 간단하게 사용 가능합니다.
+
+- [Custom GPT](https://chatgpt.com/g/g-6a2bd420c32c8191bdf8d1802dd5cc64-math-for-professionals-and-non-stem-students)
+
 ### Claude (claude.ai / Claude Code)
 - **claude.ai** — Project를 만들고 *지침(Instructions)* 에 페르소나 md를 붙여넣은 뒤, 전사본·정리노트·Anki `.md`들을 *Project knowledge* 로 추가합니다. 이후 그 Project 안에서 대화하면 됩니다.
 - **Claude Code (CLI)** — 이 레포에서 열면 끝입니다. "1강 가르쳐줘" → `lecture-tutor`, "퀴즈 내줘 / 계산 훈련 시켜줘" → `lecture-quiz-master` 스킬이 자동으로 페르소나를 입습니다. 수동 주입도 가능: `claude --append-system-prompt "$(cat agents/personas/math-tutor.persona.md)"`.
@@ -82,4 +84,4 @@
 - **ChatGPT Tasks(예약 작업)** — 페르소나를 넣어 둔 Project/GPT 대화에서 예약합니다. 퀴즈: "매일 아침 9시에 직문수 드릴 1문제를 내고, 내가 답하면 채점해 줘". 강의 인트로: "매일 아침 9시에 직문수 노트에서 주제 하나를 골라 5분 분량 인트로 강의를 보내 줘 — 끝에 이어갈 질문 3개와 함께". 매일 알림으로 도착합니다.
 - **ChatGPT Pulse** — (Pro·모바일) 대화·메모리 기반의 매일 브리핑입니다. 페르소나와 꾸준히 대화하고 Pulse 큐레이션에 "매일 직문수 복습 퀴즈 한 문제" 또는 "오늘의 직문수 강의 인트로 하나"를 요청해 두면 아침 카드로 떠오릅니다.
 - **Gemini 예약 작업(Scheduled actions)** — "매일 오전 8시에 행렬 고유치 문제 1개를 내 줘"(퀴즈), "매일 오전 8시에 직문수 다음 단원의 인트로를 짧게 들려줘"(강의)처럼 Gemini에 직접 예약합니다.
-- **Claude Code `/schedule`** — 이 레포에서 `/schedule`로 클라우드 정기 에이전트를 만듭니다. 퀴즈: "매일 quiz-master 페르소나로 Anki 덱에서 5문제 라운드를 뽑아 `quiz-today.md`로 저장". 강의 인트로: "매일 math-tutor 페르소나로 `index.md` 순서를 따라 다음 강의의 인트로(개괄 + 계산 예시 + 다음 질문)를 `lecture-today.md`로 저장". 세션 안에서 가볍게는 `/loop`도 됩니다.
+- **Claude Code `/schedule`** — 이 레포에서 `/schedule`로 클라우드 정기 에이전트를 만듭니다. 퀴즈: "매일 quiz-master 페르소나로 Anki 덱에서 5문제 라운드를 뽑아 `quiz-today.md`로 저장". 강의 인트로: "매일 math-tutor 페르소나로 `INDEX.md` 순서를 따라 다음 강의의 인트로(개괄 + 계산 예시 + 다음 질문)를 `lecture-today.md`로 저장". 세션 안에서 가볍게는 `/loop`도 됩니다.

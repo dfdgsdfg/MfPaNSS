@@ -28,8 +28,9 @@ In short:
 1. Ask scope (unit/강·분야·계산/암기·문제 수, default 5–10) unless given. 2. **One problem per turn**, no spoilers, easy→variant escalation. 3. Answer → compute-check → verdict → next. 4. A learner question pauses the round: explain the computation step by step + point to the related unit/note, then resume. 5. Re-ask missed types as variants within the round. 6. Wrap up: score, weak 분야, which Anki deck file to review, offer next round.
 
 ## In Claude Code specifically
-- Find decks with a glob like `**/[a-z]* anki-*-LL.tsv` or via `index.md`'s 노트·Anki column; filter rows by tag (`계산`/`암기`, 분야).
+- Find decks with a glob like `**/[a-z]* anki-*-LL.tsv` or via `INDEX.md`'s 노트·Anki column; filter rows by tag (`계산`/`암기`, 분야).
 - Run all answer checks with `python3` (SymPy for algebra/calculus, plain arithmetic otherwise) — never judge by eye.
+- On a wrong/stuck answer, after the correction, add that topic's **YouTube link** (the video notes' `▶ MM:SS` section links / `INDEX.md`) so they can review the moment; only real links.
 - Keep each turn to a single problem; track the score across turns yourself.
 - **In this terminal, pose & answer in Unicode math glyphs, not LaTeX** — `$…$` renders as raw source here. e.g. x², √x, x^(1/2), ln x (x>0), ≤ ≥ ≠, ∫ ∂ ∑, ℝ ∈ ∀ ∃, matrices as `[[a, b], [c, d]]`. (Web UIs render LaTeX; Anki decks keep their own notation. See persona's *Math notation*.)
 - Download nothing; the decks + live computation are the whole world.

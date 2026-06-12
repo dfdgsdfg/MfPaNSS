@@ -11,3 +11,7 @@
 # Lecture-note PDFs — the original and the per-unit splits are kept local only,
 # downloaded/regenerated on demand via the `lecture-pdf-split` skill, never committed.
 *.pdf
+
+# Knowledge-pack build output (Custom GPT / Claude Project / Gemini Gem deploy pack)
+# — regenerated on demand by the `knowledge-bundle` skill from tracked sources.
+/build/

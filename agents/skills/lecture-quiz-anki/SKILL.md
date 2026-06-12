@@ -103,7 +103,7 @@ Name it after the unit and tag it with cohort + 강 번호, alongside that unit'
 `<NN-unit>/<short title> anki-0K-season-LL.tsv` — where **`0K`** = 기, **`LL`** = 강 번호.
 e.g. `06-linalg-2-inverse-determinant/2x2 matrix anki-04-season-17.tsv`.
 
-The `-LL` keeps decks unique when one unit gets drills from several lectures of the same cohort. Find the unit/season the way `lecture-video-fetch` / `lecture-video-notes` do (look the video up in `index.md` / `README.md`; season from the title's "N기"). A `.tsv` whose name ends in `-0K-season-LL` is **not** caught by the `**/*-season/` gitignore (that matches season *folders*). If the source video is **members-only**, keep the deck inside the gitignored `0K-season/<LL>/` folder instead, same as a members-only note.
+The `-LL` keeps decks unique when one unit gets drills from several lectures of the same cohort. Find the unit/season the way `lecture-video-fetch` / `lecture-video-notes` do (look the video up in `INDEX.md` / `README.md`; season from the title's "N기"). A `.tsv` whose name ends in `-0K-season-LL` is **not** caught by the `**/*-season/` gitignore (that matches season *folders*). If the source video is **members-only**, keep the deck inside the gitignored `0K-season/<LL>/` folder instead, same as a members-only note.
 
 
 ## Also export a problem/answer Markdown
