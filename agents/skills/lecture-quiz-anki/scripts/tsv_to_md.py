@@ -16,13 +16,24 @@
 - Front 를 첫 `<br>` 기준으로 **지시문**(헤딩)과 **문제 식**(불릿)으로 가른다.
   `<br>` 가 없으면(문장형 문제) Front 전체를 헤딩으로 두고 식 불릿은 없다.
 - 헤딩 끝의 `.`/`:` 는 떼어 깔끔하게 한다.
-- 수식은 Anki MathJax `\\( \\)`/`\\[ \\]` 를 Markdown `$ $`/`$$ $$` 로 바꾼다.
+- 수식은 Anki MathJax `\\( \\)`/`\\[ \\]` 를 Markdown `$…$`/`$$…$$` 로 바꾼다(델리미터
+  안쪽 패딩 공백은 제거 — GitHub 수식 파서가 `$ x $` 형태를 렌더링하지 않음).
 
 사용:  python tsv_to_md.py <deck.tsv> [deck2.tsv ...]
 """
-import sys, os
+import sys, os, re
+
+_BLOCK = re.compile(r"\\\[(.*?)\\\]")
+_INLINE = re.compile(r"\\\((.*?)\\\)")
 
 def conv(s):
+    # Anki MathJax \(..\)/\[..\] -> Markdown $..$/$$..$$, trimming the padding
+    # spaces just inside the delimiters: GitHub's math parser ignores a `$..$`
+    # whose opening `$` is followed by — or closing `$` preceded by — a space,
+    # so `\( x \)` must become `$x$`, not `$ x $`.
+    s = _BLOCK.sub(lambda m: "$$" + m.group(1).strip() + "$$", s)
+    s = _INLINE.sub(lambda m: "$" + m.group(1).strip() + "$", s)
+    # fallback for any unbalanced stragglers the paired regexes missed
     s = s.replace(r"\[", "$$").replace(r"\]", "$$")
     s = s.replace(r"\(", "$").replace(r"\)", "$")
     return s.strip()

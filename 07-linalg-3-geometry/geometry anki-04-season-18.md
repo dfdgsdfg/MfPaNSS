@@ -3,49 +3,49 @@
 ## 문제
 
 ### 1. 다음 행렬의 제곱 행렬을 구하시오
-- $ \begin{pmatrix}1&1\\1&1\end{pmatrix}^2 $
+- $\begin{pmatrix}1&1\\1&1\end{pmatrix}^2$
 
 ### 2. 다음 행렬의 제곱 행렬을 구하시오
-- $ \begin{pmatrix}2&1\\1&2\end{pmatrix}^2 $
+- $\begin{pmatrix}2&1\\1&2\end{pmatrix}^2$
 
 ### 3. 다음 행렬의 제곱 행렬을 구하시오
-- $ \begin{pmatrix}1&2\\2&1\end{pmatrix}^2 $
+- $\begin{pmatrix}1&2\\2&1\end{pmatrix}^2$
 
 ### 4. 다음 행렬의 세제곱 행렬을 구하시오
-- $ \begin{pmatrix}2&0\\0&2\end{pmatrix}^3 $
+- $\begin{pmatrix}2&0\\0&2\end{pmatrix}^3$
 
 ### 5. 다음 행렬의 네제곱 행렬을 구하시오
-- $ \begin{pmatrix}3&0\\0&3\end{pmatrix}^4 $
+- $\begin{pmatrix}3&0\\0&3\end{pmatrix}^4$
 
 ### 6. 다음 행렬의 10제곱 행렬을 구하시오
-- $ \begin{pmatrix}2&0\\0&2\end{pmatrix}^{10} $
+- $\begin{pmatrix}2&0\\0&2\end{pmatrix}^{10}$
 
 ### 7. 다음 행렬의 세제곱 행렬을 구하시오
-- $ \begin{pmatrix}3&0\\0&3\end{pmatrix}^3 $
+- $\begin{pmatrix}3&0\\0&3\end{pmatrix}^3$
 
 ### 8. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ 2x^2+4x+1=0 $
+- $2x^2+4x+1=0$
 
 ### 9. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ x^2+2x+3=0 $
+- $x^2+2x+3=0$
 
 ### 10. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ x^2+6x+1=0 $
+- $x^2+6x+1=0$
 
 ### 11. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ x^2-2x+4=0 $
+- $x^2-2x+4=0$
 
 ### 12. 다음 2차 방정식의 근을 구하시오
-- $ x^2-4x+3=0 $
+- $x^2-4x+3=0$
 
 ### 13. 다음 행렬의 역행렬을 구하시오
-- $ \begin{pmatrix}2&1\\1&2\end{pmatrix} $
+- $\begin{pmatrix}2&1\\1&2\end{pmatrix}$
 
 ### 14. 다음 행렬의 역행렬을 구하시오
-- $ \begin{pmatrix}1&2\\2&1\end{pmatrix} $
+- $\begin{pmatrix}1&2\\2&1\end{pmatrix}$
 
 ### 15. 다음 행렬의 역행렬을 구하시오
-- $ \begin{pmatrix}3&2\\2&3\end{pmatrix} $
+- $\begin{pmatrix}3&2\\2&3\end{pmatrix}$
 
 ### 16. 벡터를 반시계 방향으로 $\theta$ 만큼 돌리는 회전행렬의 형태를 쓰시오.
 
@@ -80,67 +80,67 @@
 ## 해답
 
 ### 1. 다음 행렬의 제곱 행렬을 구하시오
-- $ \begin{pmatrix}1&1\\1&1\end{pmatrix}^2 $
-- $ \begin{pmatrix}2&2\\2&2\end{pmatrix} $<br>성분 규칙: 첫 성분 $1^2+1\cdot1=2$, 나머지도 모두 $2$.
+- $\begin{pmatrix}1&1\\1&1\end{pmatrix}^2$
+- $\begin{pmatrix}2&2\\2&2\end{pmatrix}$<br>성분 규칙: 첫 성분 $1^2+1\cdot1=2$, 나머지도 모두 $2$.
 
 ### 2. 다음 행렬의 제곱 행렬을 구하시오
-- $ \begin{pmatrix}2&1\\1&2\end{pmatrix}^2 $
-- $ \begin{pmatrix}5&4\\4&5\end{pmatrix} $<br>대각: $2^2+1\cdot1=5$, 비대각: $2\cdot1+1\cdot2=4$.
+- $\begin{pmatrix}2&1\\1&2\end{pmatrix}^2$
+- $\begin{pmatrix}5&4\\4&5\end{pmatrix}$<br>대각: $2^2+1\cdot1=5$, 비대각: $2\cdot1+1\cdot2=4$.
 
 ### 3. 다음 행렬의 제곱 행렬을 구하시오
-- $ \begin{pmatrix}1&2\\2&1\end{pmatrix}^2 $
-- $ \begin{pmatrix}5&4\\4&5\end{pmatrix} $<br>대각: $1^2+2\cdot2=5$, 비대각: $1\cdot2+2\cdot1=4$.
+- $\begin{pmatrix}1&2\\2&1\end{pmatrix}^2$
+- $\begin{pmatrix}5&4\\4&5\end{pmatrix}$<br>대각: $1^2+2\cdot2=5$, 비대각: $1\cdot2+2\cdot1=4$.
 
 ### 4. 다음 행렬의 세제곱 행렬을 구하시오
-- $ \begin{pmatrix}2&0\\0&2\end{pmatrix}^3 $
-- $ \begin{pmatrix}8&0\\0&8\end{pmatrix} $<br>대각행렬의 거듭제곱: $\mathrm{diag}(2)^3=\mathrm{diag}(2^3)=\mathrm{diag}(8)$.
+- $\begin{pmatrix}2&0\\0&2\end{pmatrix}^3$
+- $\begin{pmatrix}8&0\\0&8\end{pmatrix}$<br>대각행렬의 거듭제곱: $\mathrm{diag}(2)^3=\mathrm{diag}(2^3)=\mathrm{diag}(8)$.
 
 ### 5. 다음 행렬의 네제곱 행렬을 구하시오
-- $ \begin{pmatrix}3&0\\0&3\end{pmatrix}^4 $
-- $ \begin{pmatrix}81&0\\0&81\end{pmatrix} $<br>$\mathrm{diag}(3)^4=\mathrm{diag}(3^4)=\mathrm{diag}(81)$.
+- $\begin{pmatrix}3&0\\0&3\end{pmatrix}^4$
+- $\begin{pmatrix}81&0\\0&81\end{pmatrix}$<br>$\mathrm{diag}(3)^4=\mathrm{diag}(3^4)=\mathrm{diag}(81)$.
 
 ### 6. 다음 행렬의 10제곱 행렬을 구하시오
-- $ \begin{pmatrix}2&0\\0&2\end{pmatrix}^{10} $
-- $ \begin{pmatrix}1024&0\\0&1024\end{pmatrix} $<br>$\mathrm{diag}(2)^{10}=\mathrm{diag}(2^{10})=\mathrm{diag}(1024)$.
+- $\begin{pmatrix}2&0\\0&2\end{pmatrix}^{10}$
+- $\begin{pmatrix}1024&0\\0&1024\end{pmatrix}$<br>$\mathrm{diag}(2)^{10}=\mathrm{diag}(2^{10})=\mathrm{diag}(1024)$.
 
 ### 7. 다음 행렬의 세제곱 행렬을 구하시오
-- $ \begin{pmatrix}3&0\\0&3\end{pmatrix}^3 $
-- $ \begin{pmatrix}27&0\\0&27\end{pmatrix} $<br>$\mathrm{diag}(3)^3=\mathrm{diag}(3^3)=\mathrm{diag}(27)$.
+- $\begin{pmatrix}3&0\\0&3\end{pmatrix}^3$
+- $\begin{pmatrix}27&0\\0&27\end{pmatrix}$<br>$\mathrm{diag}(3)^3=\mathrm{diag}(3^3)=\mathrm{diag}(27)$.
 
 ### 8. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ 2x^2+4x+1=0 $
-- $ x=-1\pm\dfrac{\sqrt{2}}{2} $<br>$a=2,\ 2b'=4\Rightarrow b'=2,\ c=1$. $x=\dfrac{-b'\pm\sqrt{b'^2-ac}}{a}=\dfrac{-2\pm\sqrt{4-2}}{2}=-1\pm\dfrac{\sqrt2}{2}$.
+- $2x^2+4x+1=0$
+- $x=-1\pm\dfrac{\sqrt{2}}{2}$<br>$a=2,\ 2b'=4\Rightarrow b'=2,\ c=1$. $x=\dfrac{-b'\pm\sqrt{b'^2-ac}}{a}=\dfrac{-2\pm\sqrt{4-2}}{2}=-1\pm\dfrac{\sqrt2}{2}$.
 
 ### 9. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ x^2+2x+3=0 $
-- $ x=-1\pm\sqrt{2}\,i $<br>$b'=1,\ a=1,\ c=3$. $x=-1\pm\sqrt{1-3}=-1\pm\sqrt{-2}=-1\pm\sqrt2\,i$.
+- $x^2+2x+3=0$
+- $x=-1\pm\sqrt{2}\,i$<br>$b'=1,\ a=1,\ c=3$. $x=-1\pm\sqrt{1-3}=-1\pm\sqrt{-2}=-1\pm\sqrt2\,i$.
 
 ### 10. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ x^2+6x+1=0 $
-- $ x=-3\pm 2\sqrt{2} $<br>$b'=3,\ a=1,\ c=1$. $x=-3\pm\sqrt{9-1}=-3\pm\sqrt8=-3\pm2\sqrt2$.
+- $x^2+6x+1=0$
+- $x=-3\pm 2\sqrt{2}$<br>$b'=3,\ a=1,\ c=1$. $x=-3\pm\sqrt{9-1}=-3\pm\sqrt8=-3\pm2\sqrt2$.
 
 ### 11. 다음 2차 방정식의 근을 구하시오 (분모가 $2a$ 가 아니게)
-- $ x^2-2x+4=0 $
-- $ x=1\pm\sqrt{3}\,i $<br>$b'=-1,\ a=1,\ c=4$. $x=1\pm\sqrt{1-4}=1\pm\sqrt{-3}=1\pm\sqrt3\,i$.
+- $x^2-2x+4=0$
+- $x=1\pm\sqrt{3}\,i$<br>$b'=-1,\ a=1,\ c=4$. $x=1\pm\sqrt{1-4}=1\pm\sqrt{-3}=1\pm\sqrt3\,i$.
 
 ### 12. 다음 2차 방정식의 근을 구하시오
-- $ x^2-4x+3=0 $
-- $ x=1,\ 3 $<br>인수분해 $(x-1)(x-3)=0$. 근의 공식으로도 $x=2\pm\sqrt{4-3}=2\pm1$.
+- $x^2-4x+3=0$
+- $x=1,\ 3$<br>인수분해 $(x-1)(x-3)=0$. 근의 공식으로도 $x=2\pm\sqrt{4-3}=2\pm1$.
 
 ### 13. 다음 행렬의 역행렬을 구하시오
-- $ \begin{pmatrix}2&1\\1&2\end{pmatrix} $
-- $ \dfrac{1}{3}\begin{pmatrix}2&-1\\-1&2\end{pmatrix} $<br>$\det=4-1=3$. $A^{-1}=\dfrac{1}{ad-bc}\begin{pmatrix}d&-b\\-c&a\end{pmatrix}$.
+- $\begin{pmatrix}2&1\\1&2\end{pmatrix}$
+- $\dfrac{1}{3}\begin{pmatrix}2&-1\\-1&2\end{pmatrix}$<br>$\det=4-1=3$. $A^{-1}=\dfrac{1}{ad-bc}\begin{pmatrix}d&-b\\-c&a\end{pmatrix}$.
 
 ### 14. 다음 행렬의 역행렬을 구하시오
-- $ \begin{pmatrix}1&2\\2&1\end{pmatrix} $
-- $ -\dfrac{1}{3}\begin{pmatrix}1&-2\\-2&1\end{pmatrix} $<br>$\det=1-4=-3$. $A^{-1}=\dfrac{1}{-3}\begin{pmatrix}1&-2\\-2&1\end{pmatrix}$.
+- $\begin{pmatrix}1&2\\2&1\end{pmatrix}$
+- $-\dfrac{1}{3}\begin{pmatrix}1&-2\\-2&1\end{pmatrix}$<br>$\det=1-4=-3$. $A^{-1}=\dfrac{1}{-3}\begin{pmatrix}1&-2\\-2&1\end{pmatrix}$.
 
 ### 15. 다음 행렬의 역행렬을 구하시오
-- $ \begin{pmatrix}3&2\\2&3\end{pmatrix} $
-- $ \dfrac{1}{5}\begin{pmatrix}3&-2\\-2&3\end{pmatrix} $<br>$\det=9-4=5$. ※ 영상에서는 분모를 $\tfrac13$로 말했으나 계산상 $\tfrac15$.
+- $\begin{pmatrix}3&2\\2&3\end{pmatrix}$
+- $\dfrac{1}{5}\begin{pmatrix}3&-2\\-2&3\end{pmatrix}$<br>$\det=9-4=5$. ※ 영상에서는 분모를 $\tfrac13$로 말했으나 계산상 $\tfrac15$.
 
 ### 16. 벡터를 반시계 방향으로 $\theta$ 만큼 돌리는 회전행렬의 형태를 쓰시오.
-- $ R(\theta)=\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix} $<br>$(1,0)\mapsto(\cos\theta,\sin\theta),\ (0,1)\mapsto(-\sin\theta,\cos\theta)$, $\det R=1$.
+- $R(\theta)=\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}$<br>$(1,0)\mapsto(\cos\theta,\sin\theta),\ (0,1)\mapsto(-\sin\theta,\cos\theta)$, $\det R=1$.
 
 ### 17. 고유치와 고유벡터의 정의를 진술하시오. (어떤 조건이 반드시 들어가야 하는가?)
 - 정사각행렬 $A$ 에 대해 $Av=\lambda v$ 를 만족하는 스칼라 $\lambda$ 와 벡터 $v$ 를, $\lambda$ 를 고유치·$v$ 를 고유벡터라 한다.<br>핵심: $\lambda$ 와 $v$ 는 한 식 $Av=\lambda v$ 로 <b>동시에</b> 규정되며, 정의상 반드시 $v\neq\mathbf 0$ (영벡터가 아니어야) 한다.

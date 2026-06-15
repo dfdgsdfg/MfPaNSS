@@ -3,109 +3,109 @@
 ## 문제
 
 ### 1. 다음 식을 전개하시오
-- $ (x+1)(x+2)(x+3) $
+- $(x+1)(x+2)(x+3)$
 
 ### 2. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,1 $
+- $\dfrac{d}{dx}\,1$
 
 ### 3. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\sqrt{x} $
+- $\dfrac{d}{dx}\,\sqrt{x}$
 
 ### 4. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\ln x $
+- $\dfrac{d}{dx}\,\ln x$
 
 ### 5. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,x^{2025} $
+- $\dfrac{d}{dx}\,x^{2025}$
 
 ### 6. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\cos x $
+- $\dfrac{d}{dx}\,\cos x$
 
 ### 7. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\tan x $
+- $\dfrac{d}{dx}\,\tan x$
 
 ### 8. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,e^{x} $
+- $\dfrac{d}{dx}\,e^{x}$
 
 ### 9. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(x^{3}+1) $
+- $\dfrac{d}{dx}\,(x^{3}+1)$
 
 ### 10. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\dfrac{1}{x} $
+- $\dfrac{d}{dx}\,\dfrac{1}{x}$
 
 ### 11. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,3x $
+- $\dfrac{d}{dx}\,3x$
 
 ### 12. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,5\sqrt{x} $
+- $\dfrac{d}{dx}\,5\sqrt{x}$
 
 ### 13. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-\sin x) $
+- $\dfrac{d}{dx}\,(-\sin x)$
 
 ### 14. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-\cos x) $
+- $\dfrac{d}{dx}\,(-\cos x)$
 
 ### 15. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\dfrac{1}{3}x^{3} $
+- $\dfrac{d}{dx}\,\dfrac{1}{3}x^{3}$
 
 ### 16. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-\tan x) $
+- $\dfrac{d}{dx}\,(-\tan x)$
 
 ### 17. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-5e^{x}) $
+- $\dfrac{d}{dx}\,(-5e^{x})$
 
 ### 18. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(\sin x-\cos x) $
+- $\dfrac{d}{dx}\,(\sin x-\cos x)$
 
 ### 19. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(e^{x}+1) $
+- $\dfrac{d}{dx}\,(e^{x}+1)$
 
 ### 20. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(e^{x}+\ln x) $
+- $\dfrac{d}{dx}\,(e^{x}+\ln x)$
 
 ### 21. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(e^{x}+\tan x) $
+- $\dfrac{d}{dx}\,(e^{x}+\tan x)$
 
 ### 22. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(\ln x+\cos x) $
+- $\dfrac{d}{dx}\,(\ln x+\cos x)$
 
 ### 23. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(1+\sqrt{x}) $
+- $\dfrac{d}{dx}\,(1+\sqrt{x})$
 
 ### 24. 다음을 적분하시오
-- $ \displaystyle\int (e^{x}+1)\,dx $
+- $\displaystyle\int (e^{x}+1)\,dx$
 
 ### 25. 다음을 적분하시오
-- $ \displaystyle\int (\cos x+x+1)\,dx $
+- $\displaystyle\int (\cos x+x+1)\,dx$
 
 ### 26. 다음을 적분하시오
-- $ \displaystyle\int (\sin x+1)\,dx $
+- $\displaystyle\int (\sin x+1)\,dx$
 
 ### 27. 다음을 적분하시오
-- $ \displaystyle\int (\sin x+5)\,dx $
+- $\displaystyle\int (\sin x+5)\,dx$
 
 ### 28. 다음을 적분하시오
-- $ \displaystyle\int (x^{3}+2x)\,dx $
+- $\displaystyle\int (x^{3}+2x)\,dx$
 
 ### 29. 다음을 적분하시오
-- $ \displaystyle\int \Big(\cos x+\dfrac{1}{x}\Big)\,dx $
+- $\displaystyle\int \Big(\cos x+\dfrac{1}{x}\Big)\,dx$
 
 ### 30. 다음을 적분하시오
-- $ \displaystyle\int (\cos x+2x)\,dx $
+- $\displaystyle\int (\cos x+2x)\,dx$
 
 ### 31. 다음을 적분하시오
-- $ \displaystyle\int (3x^{2}+x)\,dx $
+- $\displaystyle\int (3x^{2}+x)\,dx$
 
 ### 32. 다음을 적분하시오
-- $ \displaystyle\int (\cos x+\sin x)\,dx $
+- $\displaystyle\int (\cos x+\sin x)\,dx$
 
 ### 33. 다음을 적분하시오
-- $ \displaystyle\int (\sin x+\sec^{2} x)\,dx $
+- $\displaystyle\int (\sin x+\sec^{2} x)\,dx$
 
 ### 34. 다음을 적분하시오. (분모를 날리고 싶게 만든 "함정")
-- $ \displaystyle\int \Big(x^{2026}+\dfrac{1}{x}\Big)\,dx $
+- $\displaystyle\int \Big(x^{2026}+\dfrac{1}{x}\Big)\,dx$
 
 ### 35. 다음을 적분하시오. (함정 — 다룬 적 없는 $\ln x$의 적분)
-- $ \displaystyle\int \ln x\,dx $
+- $\displaystyle\int \ln x\,dx$
 
 ### 36. $2\times 2$ 행렬 $A$의 고유치를 구하는 절차를 쓰시오.
 
@@ -154,144 +154,144 @@
 ## 해답
 
 ### 1. 다음 식을 전개하시오
-- $ (x+1)(x+2)(x+3) $
-- $ x^3+6x^2+11x+6 $<br>한 항씩(곱 1개), 두 개씩 곱한 합($x^2$ 계수), 세 개 곱(상수)로 떨어집니다.
+- $(x+1)(x+2)(x+3)$
+- $x^3+6x^2+11x+6$<br>한 항씩(곱 1개), 두 개씩 곱한 합($x^2$ 계수), 세 개 곱(상수)로 떨어집니다.
 
 ### 2. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,1 $
-- $ 0 $<br>상수의 미분은 $0$.
+- $\dfrac{d}{dx}\,1$
+- $0$<br>상수의 미분은 $0$.
 
 ### 3. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\sqrt{x} $
-- $ \dfrac{1}{2}x^{-1/2}=\dfrac{1}{2\sqrt{x}} $<br>$\sqrt{x}=x^{1/2}$, 거듭제곱 룰 $\alpha x^{\alpha-1}$에 $\alpha=\tfrac12$.
+- $\dfrac{d}{dx}\,\sqrt{x}$
+- $\dfrac{1}{2}x^{-1/2}=\dfrac{1}{2\sqrt{x}}$<br>$\sqrt{x}=x^{1/2}$, 거듭제곱 룰 $\alpha x^{\alpha-1}$에 $\alpha=\tfrac12$.
 
 ### 4. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\ln x $
-- $ \dfrac{1}{x} $
+- $\dfrac{d}{dx}\,\ln x$
+- $\dfrac{1}{x}$
 
 ### 5. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,x^{2025} $
-- $ 2025\,x^{2024} $<br>거듭제곱 룰 $\dfrac{d}{dx}x^{\alpha}=\alpha x^{\alpha-1}$.
+- $\dfrac{d}{dx}\,x^{2025}$
+- $2025\,x^{2024}$<br>거듭제곱 룰 $\dfrac{d}{dx}x^{\alpha}=\alpha x^{\alpha-1}$.
 
 ### 6. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\cos x $
-- $ -\sin x $
+- $\dfrac{d}{dx}\,\cos x$
+- $-\sin x$
 
 ### 7. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\tan x $
-- $ \sec^2 x $
+- $\dfrac{d}{dx}\,\tan x$
+- $\sec^2 x$
 
 ### 8. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,e^{x} $
-- $ e^{x} $<br>지수함수는 미분해도 변하지 않습니다.
+- $\dfrac{d}{dx}\,e^{x}$
+- $e^{x}$<br>지수함수는 미분해도 변하지 않습니다.
 
 ### 9. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(x^{3}+1) $
-- $ 3x^{2} $<br>$x^3 \to 3x^2$, 상수 $1 \to 0$.
+- $\dfrac{d}{dx}\,(x^{3}+1)$
+- $3x^{2}$<br>$x^3 \to 3x^2$, 상수 $1 \to 0$.
 
 ### 10. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\dfrac{1}{x} $
-- $ -x^{-2}=-\dfrac{1}{x^{2}} $<br>$\dfrac1x=x^{-1}$, $\alpha=-1$을 거듭제곱 룰에 대입.
+- $\dfrac{d}{dx}\,\dfrac{1}{x}$
+- $-x^{-2}=-\dfrac{1}{x^{2}}$<br>$\dfrac1x=x^{-1}$, $\alpha=-1$을 거듭제곱 룰에 대입.
 
 ### 11. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,3x $
-- $ 3 $<br>상수배는 그대로: $3\cdot\dfrac{d}{dx}x=3\cdot1$.
+- $\dfrac{d}{dx}\,3x$
+- $3$<br>상수배는 그대로: $3\cdot\dfrac{d}{dx}x=3\cdot1$.
 
 ### 12. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,5\sqrt{x} $
-- $ 5\cdot\dfrac{1}{2}x^{-1/2}=\dfrac{5}{2\sqrt{x}} $<br>상수배는 그대로 앞에 붙입니다.
+- $\dfrac{d}{dx}\,5\sqrt{x}$
+- $5\cdot\dfrac{1}{2}x^{-1/2}=\dfrac{5}{2\sqrt{x}}$<br>상수배는 그대로 앞에 붙입니다.
 
 ### 13. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-\sin x) $
-- $ -\cos x $
+- $\dfrac{d}{dx}\,(-\sin x)$
+- $-\cos x$
 
 ### 14. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-\cos x) $
-- $ \sin x $<br>$\cos x \to -\sin x$에 $-1$을 곱해 $\sin x$.
+- $\dfrac{d}{dx}\,(-\cos x)$
+- $\sin x$<br>$\cos x \to -\sin x$에 $-1$을 곱해 $\sin x$.
 
 ### 15. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,\dfrac{1}{3}x^{3} $
-- $ x^{2} $<br>$x^3 \to 3x^2$, 앞의 $\tfrac13$과 곱해 $x^2$.
+- $\dfrac{d}{dx}\,\dfrac{1}{3}x^{3}$
+- $x^{2}$<br>$x^3 \to 3x^2$, 앞의 $\tfrac13$과 곱해 $x^2$.
 
 ### 16. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-\tan x) $
-- $ -\sec^2 x $
+- $\dfrac{d}{dx}\,(-\tan x)$
+- $-\sec^2 x$
 
 ### 17. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(-5e^{x}) $
-- $ -5e^{x} $
+- $\dfrac{d}{dx}\,(-5e^{x})$
+- $-5e^{x}$
 
 ### 18. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(\sin x-\cos x) $
-- $ \cos x+\sin x $<br>$\sin x \to \cos x$, $-\cos x \to +\sin x$.
+- $\dfrac{d}{dx}\,(\sin x-\cos x)$
+- $\cos x+\sin x$<br>$\sin x \to \cos x$, $-\cos x \to +\sin x$.
 
 ### 19. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(e^{x}+1) $
-- $ e^{x} $<br>$e^x \to e^x$, 상수 $1 \to 0$.
+- $\dfrac{d}{dx}\,(e^{x}+1)$
+- $e^{x}$<br>$e^x \to e^x$, 상수 $1 \to 0$.
 
 ### 20. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(e^{x}+\ln x) $
-- $ e^{x}+\dfrac{1}{x} $
+- $\dfrac{d}{dx}\,(e^{x}+\ln x)$
+- $e^{x}+\dfrac{1}{x}$
 
 ### 21. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(e^{x}+\tan x) $
-- $ e^{x}+\sec^2 x $
+- $\dfrac{d}{dx}\,(e^{x}+\tan x)$
+- $e^{x}+\sec^2 x$
 
 ### 22. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(\ln x+\cos x) $
-- $ \dfrac{1}{x}-\sin x $
+- $\dfrac{d}{dx}\,(\ln x+\cos x)$
+- $\dfrac{1}{x}-\sin x$
 
 ### 23. 다음을 미분하시오
-- $ \dfrac{d}{dx}\,(1+\sqrt{x}) $
-- $ \dfrac{1}{2}x^{-1/2}=\dfrac{1}{2\sqrt{x}} $<br>상수 $1 \to 0$, $\sqrt{x} \to \tfrac12 x^{-1/2}$.
+- $\dfrac{d}{dx}\,(1+\sqrt{x})$
+- $\dfrac{1}{2}x^{-1/2}=\dfrac{1}{2\sqrt{x}}$<br>상수 $1 \to 0$, $\sqrt{x} \to \tfrac12 x^{-1/2}$.
 
 ### 24. 다음을 적분하시오
-- $ \displaystyle\int (e^{x}+1)\,dx $
-- $ e^{x}+x+C $
+- $\displaystyle\int (e^{x}+1)\,dx$
+- $e^{x}+x+C$
 
 ### 25. 다음을 적분하시오
-- $ \displaystyle\int (\cos x+x+1)\,dx $
-- $ \sin x+\dfrac{1}{2}x^{2}+x+C $
+- $\displaystyle\int (\cos x+x+1)\,dx$
+- $\sin x+\dfrac{1}{2}x^{2}+x+C$
 
 ### 26. 다음을 적분하시오
-- $ \displaystyle\int (\sin x+1)\,dx $
-- $ -\cos x+x+C $
+- $\displaystyle\int (\sin x+1)\,dx$
+- $-\cos x+x+C$
 
 ### 27. 다음을 적분하시오
-- $ \displaystyle\int (\sin x+5)\,dx $
-- $ -\cos x+5x+C $
+- $\displaystyle\int (\sin x+5)\,dx$
+- $-\cos x+5x+C$
 
 ### 28. 다음을 적분하시오
-- $ \displaystyle\int (x^{3}+2x)\,dx $
-- $ \dfrac{1}{4}x^{4}+x^{2}+C $
+- $\displaystyle\int (x^{3}+2x)\,dx$
+- $\dfrac{1}{4}x^{4}+x^{2}+C$
 
 ### 29. 다음을 적분하시오
-- $ \displaystyle\int \Big(\cos x+\dfrac{1}{x}\Big)\,dx $
-- $ \sin x+\ln x+C $
+- $\displaystyle\int \Big(\cos x+\dfrac{1}{x}\Big)\,dx$
+- $\sin x+\ln x+C$
 
 ### 30. 다음을 적분하시오
-- $ \displaystyle\int (\cos x+2x)\,dx $
-- $ \sin x+x^{2}+C $
+- $\displaystyle\int (\cos x+2x)\,dx$
+- $\sin x+x^{2}+C$
 
 ### 31. 다음을 적분하시오
-- $ \displaystyle\int (3x^{2}+x)\,dx $
-- $ x^{3}+\dfrac{1}{2}x^{2}+C $<br>※ 영상에서 한 참여자가 답한 계수를 강사가 "이상하다"고 했고, 올바른 계수는 $x^2$항이 $\tfrac12$입니다.
+- $\displaystyle\int (3x^{2}+x)\,dx$
+- $x^{3}+\dfrac{1}{2}x^{2}+C$<br>※ 영상에서 한 참여자가 답한 계수를 강사가 "이상하다"고 했고, 올바른 계수는 $x^2$항이 $\tfrac12$입니다.
 
 ### 32. 다음을 적분하시오
-- $ \displaystyle\int (\cos x+\sin x)\,dx $
-- $ \sin x-\cos x+C $
+- $\displaystyle\int (\cos x+\sin x)\,dx$
+- $\sin x-\cos x+C$
 
 ### 33. 다음을 적분하시오
-- $ \displaystyle\int (\sin x+\sec^{2} x)\,dx $
-- $ -\cos x+\tan x+C $
+- $\displaystyle\int (\sin x+\sec^{2} x)\,dx$
+- $-\cos x+\tan x+C$
 
 ### 34. 다음을 적분하시오. (분모를 날리고 싶게 만든 "함정")
-- $ \displaystyle\int \Big(x^{2026}+\dfrac{1}{x}\Big)\,dx $
-- $ \dfrac{1}{2027}x^{2027}+\ln x+C $<br>$\dfrac1x$는 거듭제곱 룰이 아니라 $\ln x$로 적분합니다.
+- $\displaystyle\int \Big(x^{2026}+\dfrac{1}{x}\Big)\,dx$
+- $\dfrac{1}{2027}x^{2027}+\ln x+C$<br>$\dfrac1x$는 거듭제곱 룰이 아니라 $\ln x$로 적분합니다.
 
 ### 35. 다음을 적분하시오. (함정 — 다룬 적 없는 $\ln x$의 적분)
-- $ \displaystyle\int \ln x\,dx $
-- $ x\ln x-x+C $<br>※ 영상에서 $\tfrac1x+C$라 답한 분이 있었으나 그것은 오답입니다.
+- $\displaystyle\int \ln x\,dx$
+- $x\ln x-x+C$<br>※ 영상에서 $\tfrac1x+C$라 답한 분이 있었으나 그것은 오답입니다.
 
 ### 36. $2\times 2$ 행렬 $A$의 고유치를 구하는 절차를 쓰시오.
 - $A\mathbf{x}=\lambda\mathbf{x}$를 옮겨 $(A-\lambda I)\mathbf{x}=\mathbf{0}$을 만들고, 특성방정식 $\det(A-\lambda I)=0$을 풀면 됩니다.
